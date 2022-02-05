@@ -1,11 +1,8 @@
 # jphp-java-ext -- jphp扩展，用于增强对java对象的操作
-该项目主要有2个功能
-1. 增强对java对象的操作
-由于 jphp 官方提供的API不支持直接操作java对象，
 
-## 增强对java对象的操作
+## 1 增强对java对象的操作
 
-### java调用端
+### 1.1 java调用端
 ```
 @Test
 fun testJphpLauncher(){
@@ -21,7 +18,7 @@ fun testJphpLauncher(){
 }
 ```
 
-### php渲染端
+### 1.2 php渲染端
 1. 使用 WrapJavaObject 包含变量
 ```
 use php\lang\WrapJavaObject;
@@ -52,7 +49,7 @@ $pojo->key = 'title2'; // 写属性，先尝试调用setter方法，然后写属
 echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属性
 ```
 
-## 性能最好的模板引擎
+## 2 性能最好的模板引擎
 针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试， 详见代码[TemplateTests.kt](https://github.com/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
 
 3个模板引擎的测试结果如下
