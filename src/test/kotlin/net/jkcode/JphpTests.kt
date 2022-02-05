@@ -26,7 +26,7 @@ class JphpTests {
     fun testJphpLauncher(){
         val lan = JphpLauncher.instance()
         val data = mapOf(
-                "name" to "shijianhang",
+                "name" to "shi",
                 "maparray" to mapOf("age" to 11, "addr" to "nanning"), // 会转换php的array类型（即java的ArrayMemory）
                 // WrapJavaObject
                 "mapjo" to WrapJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),

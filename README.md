@@ -1,14 +1,29 @@
 # jphp-java-ext -- jphp扩展，用于增强对java对象的操作
 
-## 1 增强对java对象的操作
+## 1 增强执行php的API
+主要的作用是：
+1. 开放参数来指定php文件名+参数；
+2. 简化调用；
+3. 支持多线程执行，每个线程独有一个jphp引擎；
+4. 作为模板引擎的基础。
 
-### 1.1 java调用端
+demo如下：
+```
+import net.jkcode.jphp.ext.JphpLauncher
+
+// 执行 index.php 文件，并设置变量$name = "shi"
+JphpLauncher.instance().run("index.php" /* php 文件路径 */, mapOf("name" to "shi") /* 包含变量名与变量值的map */)
+```
+## 2 增强对java对象的操作
+主要是实现`WrapJavaObject`，方便包装java对象，并在php中直接读写属性与调用方法
+
+### 2.1 java调用端
 ```
 @Test
 fun testJphpLauncher(){
     val lan = JphpLauncher.instance()
     val data = mapOf(
-            "name" to "shijianhang",
+            "name" to "shi",
             "maparray" to mapOf("age" to 11, "addr" to "nanning"), // 会转换php的array类型（即java的ArrayMemory）
             // WrapJavaObject
             "mapjo" to WrapJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
@@ -18,7 +33,7 @@ fun testJphpLauncher(){
 }
 ```
 
-### 1.2 php渲染端
+### 2.2 php渲染端
 1. 使用 WrapJavaObject 包含变量
 ```
 use php\lang\WrapJavaObject;
@@ -49,7 +64,7 @@ $pojo->key = 'title2'; // 写属性，先尝试调用setter方法，然后写属
 echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属性
 ```
 
-## 2 性能最好的模板引擎
+## 3 性能最好的模板引擎
 针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试， 详见代码[TemplateTests.kt](https://github.com/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
 
 3个模板引擎的测试结果如下
@@ -58,7 +73,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 执行runVelocity()耗时: 36s
 执行runFreemarker()耗时: 14s
 ```
-=> jphp是性能最好的模板引擎
+=> jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
 ### 附上3个模板引擎的模板代码
 1. jphp
