@@ -2,8 +2,8 @@
 
 ## 1 增强执行php的API
 主要的作用是：
-1. 开放参数来指定php文件名+参数；
-2. 简化调用；
+1. 简化调用；
+2. 开放参数来指定php文件名+变量，自动将java变量转换为php变量；
 3. 支持多线程执行，每个线程独有一个jphp引擎；
 4. 作为模板引擎的基础。
 
@@ -65,8 +65,15 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 ```
 
 ## 3 性能最好的模板引擎
-针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试， 详见代码[TemplateTests.kt](https://github.com/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
 
+### 3.1 性能对比
+针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试。
+
+1. 测试思路
+3个模板引擎对同样逻辑的模板，各自渲染1000次，对比各自耗时。
+详见代码[TemplateTests.kt](https://github.com/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
+
+2. 测试结果
 3个模板引擎的测试结果如下
 ```
 执行runJphp()耗时: 8s
@@ -75,7 +82,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 ```
 => jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
-### 附上3个模板引擎的模板代码
+### 3.2 附上3个模板引擎对应的测试模板代码
 1. jphp
 test.php
 ```

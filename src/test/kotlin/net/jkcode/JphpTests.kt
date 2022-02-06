@@ -36,9 +36,9 @@ class JphpTests {
     }
 
     @Test
-    fun testCompile(){
+    fun testCompilePhp(){
         // .php源文件目录
-        val srcDir = "/home/shi/code/java/jkmvc/jkmvc-http/src/test/resources"
+        val srcDir = "/home/shi/code/java/jphp-java-ext/src/test/resources"
         // .class编译文件的目录
         val destDir = srcDir + "/bin/"
         val env = Environment()
