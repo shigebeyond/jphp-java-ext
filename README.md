@@ -71,7 +71,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 
 1. 测试思路
 3个模板引擎对同样逻辑的模板，各自渲染1000次，对比各自耗时。
-详见代码[TemplateTests.kt](https://github.com/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
+详见代码[TemplateTests.kt](/shigebeyond/jkmvc/blob/master/jkmvc-http/src/test/kotlin/net/jkcode/jkmvc/tests/TemplateTests.kt)
 
 2. 测试结果
 3个模板引擎的测试结果如下
