@@ -48,4 +48,39 @@ class JphpTests {
         println("编译成功")
     }
 
+    @Test
+    fun testPerformanceJava(){
+        for (p in 0 until 10) {
+            val map = mutableMapOf<String, Any>("age" to 13)
+
+            val start = System.currentTimeMillis()
+            // 11s
+            /*var r = 0L
+        for(i in 0 until 10000000000){
+            if(i % 2 == 0L)
+                r += i
+            else
+                r -= i
+        }*/
+            // 0.045s
+            for (i in 0 until 3000000) {
+                map.put("name", "shi");
+                val s = map.size
+                map.get("age");
+            }
+            println("java耗时: " + (System.currentTimeMillis() - start) / 1000.0 + "s")
+        }
+    }
+
+    @Test
+    fun testPerformancePhp(){
+        val lan = JphpLauncher.instance()
+        val data = mapOf(
+                "map" to WrapJavaObject.of(lan.environment, mutableMapOf("age" to 13))
+        )
+        for (p in 0 until 10) {
+            lan.run("src/test/resources/performance.php", data)
+        }
+    }
+
 }

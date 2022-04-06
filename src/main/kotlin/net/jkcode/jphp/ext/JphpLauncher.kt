@@ -58,7 +58,7 @@ class JphpLauncher protected constructor() : Launcher() {
     }
 
     // 执行php文件
-    fun run(bootstrapFile: String, args: Map<String, Any?>, out: OutputStream? = null,  outputBuffering: Boolean = true) {
+    fun run(bootstrapFile: String, args: Map<String, Any?> = emptyMap(), out: OutputStream? = null,  outputBuffering: Boolean = true) {
         // 加载入口文件
         val bootstrap = loadFrom(bootstrapFile) ?: throw IOException("Cannot find '$bootstrapFile' resource")
 
