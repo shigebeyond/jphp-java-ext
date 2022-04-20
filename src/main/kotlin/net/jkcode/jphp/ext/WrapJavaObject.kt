@@ -1,12 +1,10 @@
 package net.jkcode.jphp.ext
 
-import net.jkcode.jkutil.common.getAccessibleField
 import net.jkcode.jkutil.common.getMethodByName
 import net.jkcode.jkutil.common.ucFirst
 import php.runtime.Memory
 import php.runtime.annotation.Reflection
 import php.runtime.env.Environment
-import php.runtime.env.TraceInfo
 import php.runtime.ext.java.JavaClass
 import php.runtime.ext.java.JavaMethod
 import php.runtime.ext.java.JavaObject
@@ -15,7 +13,6 @@ import php.runtime.lang.BaseWrapper
 import php.runtime.memory.ObjectMemory
 import php.runtime.memory.StringMemory
 import php.runtime.memory.support.MemoryUtils
-import php.runtime.memory.support.MemoryUtils.Converter
 import php.runtime.reflection.ClassEntity
 
 /**
@@ -163,18 +160,6 @@ open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<Ja
     }
 
     companion object {
-        protected val CONVERTERS: HashMap<Class<*>, Converter<*>> = MemoryUtils::class.java.getAccessibleField("CONVERTERS")!!.get(null) as HashMap<Class<*>, Converter<*>>
-
-        init {
-            // Memory 转 java object，用在php中调用java方法
-            // 添加 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
-            CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
-                override fun run(env: Environment?, trace: TraceInfo?, value: Memory): Any? {
-                    return value.toJavaObject()
-                }
-            })
-        }
-
         // 创建 WrapJavaObject 实例
         fun of(env: Environment, value: Any): WrapJavaObject {
             val javaObject = WrapJavaObject(env, env.fetchClass("php\\lang\\WrapJavaObject"))
