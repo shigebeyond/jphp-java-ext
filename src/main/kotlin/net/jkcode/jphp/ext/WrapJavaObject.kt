@@ -29,7 +29,7 @@ import php.runtime.reflection.ClassEntity
  *    php中的实例化: $obj = new WrapJavaObject($xxx);
  */
 @Reflection.Name("php\\lang\\WrapJavaObject")
-class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
+open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
 
     // 被包装的java对象
     lateinit var obj: Any

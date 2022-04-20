@@ -5,7 +5,7 @@ namespace php\lang;
  * Class WrapJavaObject
  * @packages std, core
  */
-final class WrapJavaObject
+class WrapJavaObject
 {
 
     /**

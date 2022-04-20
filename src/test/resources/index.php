@@ -25,7 +25,6 @@ $method = $cls->getDeclaredMethod('size');
 echo 'size: '. $method->invoke($obj) . "\n";
 echo 'size: '. $method->invokeArgs($obj, []) . "\n";
 
-
 // 包装java，方便调用java方法
 use php\lang\WrapJavaObject;
 // 包装string类型java对象
@@ -33,6 +32,10 @@ $strjo = new WrapJavaObject($name);
 // echo $strjo->length()."\n";
 // echo $strjo->concat(" is hero")."\n";
 echo $strjo->substring(3)."\n";
+
+class A{}
+class B extends A{
+}
 
 // 包装hashmap类型java对象
 echo 'size: '. $mapjo->size()."\n";
