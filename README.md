@@ -83,7 +83,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 => jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
 ### 3.2 附上3个模板引擎对应的测试模板代码
-1. jphp
+1. jphp引擎：
 test.php
 ```
 <?php
@@ -99,7 +99,7 @@ for ($i=0; $i <= 9999; $i++)
 }
 ```
 
-2. velocity 
+2. velocity引擎：
 test.vm
 ```
 #foreach($i in [0..9999])
@@ -114,7 +114,7 @@ test.vm
 #end
 ```
 
-3. freemarker
+3. freemarker引擎：
 test.ftl
 ```
 <#list 0..9999 as i>
