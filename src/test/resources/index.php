@@ -49,3 +49,7 @@ echo $pojo->getKey()."\n"; // 调用方法
 echo $pojo->getMessage()."\n";
 $pojo->key = 'title2'; // 写属性，先尝试调用setter方法，然后写属性
 echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属性
+
+echo __FILE__."\n";
+echo dirname(__FILE__)."\n";
+include 'src/test/resources/test.php';
