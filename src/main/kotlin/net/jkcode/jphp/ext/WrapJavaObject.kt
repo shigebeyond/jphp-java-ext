@@ -19,11 +19,12 @@ import php.runtime.reflection.ClassEntity
  * 包装java对象，用来读写属性+动态调用方法
  * 1 动态调用方法的实现
  *    仿jphp自带的 JavaObject，但该类并不能动态调用方法
- *    动态调用方法的实现，使用魔术方法，涉及到参数类型+返回值类型转换
+ *    动态调用方法的实现，使用魔术方法，使用`JavaMethod.invokeArgs()`来负责参数类型+返回值类型转换
  * 2 属性读写先调动getter/setter
  * 3 使用
  *    java中的实例化： val obj = WrapJavaObject.of(env, xxx)
  *    php中的实例化: $obj = new WrapJavaObject($xxx);
+ *    php中的方法调用（默认方法）: $obj->yyy();
  */
 @Reflection.Name("php\\lang\\WrapJavaObject")
 open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
