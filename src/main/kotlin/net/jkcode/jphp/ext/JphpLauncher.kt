@@ -5,10 +5,12 @@ import php.runtime.Memory
 import php.runtime.env.CallStackItem
 import php.runtime.env.Environment
 import php.runtime.env.TraceInfo
+import php.runtime.env.handler.ExceptionHandler
 import php.runtime.ext.core.OutputFunctions
 import php.runtime.ext.core.classes.WrapClassLoader
 import php.runtime.ext.core.classes.WrapClassLoader.WrapLauncherClassLoader
 import php.runtime.ext.java.JavaObject
+import php.runtime.lang.exception.BaseBaseException
 import php.runtime.launcher.LaunchException
 import php.runtime.launcher.Launcher
 import php.runtime.memory.ArrayMemory
@@ -72,8 +74,15 @@ class JphpLauncher protected constructor() : Launcher() {
         environment.invokeMethod(loader, "register", Memory.TRUE)
     }
 
-    // 执行php文件
-    fun run(bootstrapFile: String, args: Map<String, Any?> = emptyMap(), out: OutputStream? = null,  outputBuffering: Boolean = true) {
+    /**
+     * 执行php文件
+     * @param bootstrapFile php入口文件
+     * @param args 参数
+     * @param out 输出流
+     * @param outputBuffering 是否打开缓冲区
+     * @param exceptionHandler 一次性异常处理器，该php文件执行后会恢复原来的异常处理器
+     */
+    fun run(bootstrapFile: String, args: Map<String, Any?> = emptyMap(), out: OutputStream? = null, outputBuffering: Boolean = true, exceptionHandler: ExceptionHandler? = null) {
         // 加载入口文件
         val bootstrap = loadFrom(bootstrapFile) ?: throw IOException("Cannot find '$bootstrapFile' resource")
 
@@ -116,10 +125,18 @@ class JphpLauncher protected constructor() : Launcher() {
         if(outputBuffering)
             OutputFunctions.ob_start(environment, bootstrap.trace)
 
-        // include 执行
+        // 异常处理
+        val oeh = environment.exceptionHandler // 原来的异常处理器
+        if(exceptionHandler != null) //一次性异常处理器，该php文件执行后会恢复原来的异常处理器
+            environment.exceptionHandler = exceptionHandler
         try {
+            // include 执行
             bootstrap.includeNoThrow(environment, locals)
         } finally {
+            // 恢复原来的异常处理器
+            if(exceptionHandler != null)
+                environment.exceptionHandler = oeh
+
             // 发送内部缓冲区的内容到浏览器，并且关闭输出缓冲区
             if(outputBuffering)
                 OutputFunctions.ob_end_flush(environment, bootstrap.trace)
