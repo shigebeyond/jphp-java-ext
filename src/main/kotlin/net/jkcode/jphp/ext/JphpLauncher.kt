@@ -36,7 +36,7 @@ class JphpLauncher protected constructor() : Launcher() {
         /**
          * Memory 转 java object的转换器，用在php中调用java方法，在 WrapJavaObject / WrapReferer 等多个扩展类中用到但又不能写到某个扩展类中初始化(重复或漏)，因此统一写到这里来初始化
          */
-        protected val CONVERTERS: HashMap<Class<*>, MemoryUtils.Converter<*>> = MemoryUtils::class.java.getAccessibleField("CONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Converter<*>>
+        public val CONVERTERS: HashMap<Class<*>, MemoryUtils.Converter<*>> = MemoryUtils::class.java.getAccessibleField("CONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Converter<*>>
         init {
             // 添加 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
             CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
