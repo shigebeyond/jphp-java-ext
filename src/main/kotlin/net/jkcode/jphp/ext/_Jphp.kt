@@ -2,6 +2,7 @@ package net.jkcode.jphp.ext
 
 import net.jkcode.jkutil.common.getAccessibleField
 import php.runtime.Memory
+import php.runtime.invoke.Invoker
 import php.runtime.lang.IObject
 import php.runtime.memory.*
 
@@ -49,4 +50,24 @@ public fun Memory.toJavaObject(): Any? {
         is ReferenceMemory -> this.value.toJavaObject() // 递归
         else -> throw IllegalArgumentException("Cannot auto convert [$this] into JavaObject")
     }
+}
+
+/**
+ * 根据参数来确定是二选一调用
+ *   1 call(Memory): 参数是php对象
+ *   2 callAny(Any): 参数是java对象
+ * @param args
+ * @return
+ */
+public fun Invoker.callMemoryOrAny(vararg args: Any?): Memory? {
+    // 1 call(Memory): 参数是php对象
+    if(args.isEmpty())
+        return this.call()
+    if(args[0] is Memory) {
+        val args2 = args as Array<Memory>
+        return this.call(*args2)
+    }
+
+    // 2 callAny(Any): 参数是java对象
+    return this.callAny(args)
 }
