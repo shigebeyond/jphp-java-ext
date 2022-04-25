@@ -84,23 +84,24 @@ fun CompileScope.unregisterModule(name: String): ModuleEntity? {
  * @param name
  */
 fun Environment.unregisterModule(module: ModuleEntity){
+    // 删除模块相关的类、方法、常量
     for (entity in module.classes) {
         if (entity.isStatic) {
             classMap.remove(entity.lowerName)
         }
     }
 
+    // functionMap是保护属性, 用反射来写
+    val functionMap = functionMapField.get(this) as MutableMap<String, FunctionEntity>
     for (entity in module.functions) {
         if (entity.isStatic) {
-            // functionMap是保护属性, 用反射来写
-            val functionMap = functionMapField.get(this) as MutableMap<String, FunctionEntity>
             functionMap.remove(entity.lowerName)
         }
     }
 
+    // constantMap是保护属性, 用反射来写
+    val constantMap = constantMapField.get(this) as MutableMap<String, ConstantEntity>
     for (entity in module.constants) {
-        // constantMap是保护属性, 用反射来写
-        val constantMap = constantMapField.get(this) as MutableMap<String, ConstantEntity>
         constantMap.remove(entity.lowerName)
     }
 }
