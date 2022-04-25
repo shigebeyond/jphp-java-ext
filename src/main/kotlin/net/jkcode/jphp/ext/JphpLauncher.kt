@@ -58,8 +58,13 @@ class JphpLauncher protected constructor() : Launcher() {
         // 配置
         readConfig()
 
-        // 扩展
+        // 初始化扩展: 会初始化 environment
         initExtensions()
+
+        // 修改 Environment.moduleManager 为 SkModuleManager, 以便支持在卸载模块时也卸载模块的类/函数/常量
+        // moduleManager是保护属性, 用反射来写
+        //environment.moduleManager = SkModuleManager(environment)
+        moduleManagerField.set(environment, SkModuleManager(environment))
 
         if (isDebug()) {
             if (compileScope.tickHandler == null) {
