@@ -32,7 +32,8 @@ class JphpTests {
                 "mapjo" to WrapJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
                 "pojo" to WrapJavaObject.of(lan.environment, Message("title", "jkcode代码库"))
         )
-        lan.run("src/test/resources/index.php", data)
+        val ret = lan.run("src/test/resources/index.php", data)
+        println("----> $ret")
     }
 
     @Test

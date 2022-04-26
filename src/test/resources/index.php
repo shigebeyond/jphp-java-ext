@@ -53,3 +53,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 echo __FILE__."\n";
 echo dirname(__FILE__)."\n";
 include 'src/test/resources/test.php';
+
+return [
+    'name' => 'shi'
+];

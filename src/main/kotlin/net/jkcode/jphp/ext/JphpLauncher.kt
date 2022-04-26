@@ -85,8 +85,9 @@ class JphpLauncher protected constructor() : Launcher() {
      * @param out 输出流
      * @param outputBuffering 是否打开缓冲区
      * @param exceptionHandler 一次性异常处理器，该php文件执行后会恢复原来的异常处理器
+     * @return
      */
-    fun run(bootstrapFile: String, args: Map<String, Any?> = emptyMap(), out: OutputStream? = null, outputBuffering: Boolean = true, exceptionHandler: ExceptionHandler? = null) {
+    fun run(bootstrapFile: String, args: Map<String, Any?> = emptyMap(), out: OutputStream? = null, outputBuffering: Boolean = true, exceptionHandler: ExceptionHandler? = null): Any? {
         // 加载入口文件
         val bootstrap = loadFrom(bootstrapFile) ?: throw IOException("Cannot find '$bootstrapFile' resource")
 
@@ -133,9 +134,10 @@ class JphpLauncher protected constructor() : Launcher() {
         val oeh = environment.exceptionHandler // 原来的异常处理器
         if(exceptionHandler != null) //一次性异常处理器，该php文件执行后会恢复原来的异常处理器
             environment.exceptionHandler = exceptionHandler
+
         try {
             // include 执行
-            bootstrap.includeNoThrow(environment, locals)
+            return bootstrap.includeNoThrow(environment, locals)?.toJavaObject()
         } finally {
             // 恢复原来的异常处理器
             if(exceptionHandler != null)
