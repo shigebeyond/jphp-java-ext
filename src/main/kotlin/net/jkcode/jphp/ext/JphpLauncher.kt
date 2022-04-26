@@ -10,7 +10,6 @@ import php.runtime.ext.core.OutputFunctions
 import php.runtime.ext.core.classes.WrapClassLoader
 import php.runtime.ext.core.classes.WrapClassLoader.WrapLauncherClassLoader
 import php.runtime.ext.java.JavaObject
-import php.runtime.lang.exception.BaseBaseException
 import php.runtime.launcher.LaunchException
 import php.runtime.launcher.Launcher
 import php.runtime.memory.ArrayMemory
@@ -61,10 +60,10 @@ class JphpLauncher protected constructor() : Launcher() {
         // 初始化扩展: 会初始化 environment
         initExtensions()
 
-        // 修改 Environment.moduleManager 为 SkModuleManager, 以便支持在卸载模块时也卸载模块的类/函数/常量
+        // 修改 Environment.moduleManager 为 JkModuleManager, 以便支持在卸载模块时也卸载模块的类/函数/常量
         // moduleManager是保护属性, 用反射来写
-        //environment.moduleManager = SkModuleManager(environment)
-        moduleManagerField.set(environment, SkModuleManager(environment))
+        //environment.moduleManager = JkModuleManager(environment)
+        moduleManagerField.set(environment, JkModuleManager(environment))
 
         if (isDebug()) {
             if (compileScope.tickHandler == null) {

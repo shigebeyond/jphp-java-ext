@@ -13,7 +13,7 @@ import java.io.File
 /**
  * 改写 ModuleManager.fetchModule(), 支持在卸载模块时, 也卸载模块的类/函数/常量
  */
-class SkModuleManager(env: Environment): ModuleManager(env) {
+class JkModuleManager(env: Environment): ModuleManager(env) {
 
     override fun fetchModule(path: String, compiled: Boolean): ModuleEntity? {
         var moduleEntity = modules[path]
