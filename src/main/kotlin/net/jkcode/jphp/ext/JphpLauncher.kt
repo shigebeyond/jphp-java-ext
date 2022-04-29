@@ -18,6 +18,10 @@ import php.runtime.reflection.support.ReflectionUtils
 import java.io.IOException
 import java.io.OutputStream
 
+/**
+ * jphp启动器
+ *   environment默认是 ConcurrentEnvironment，支持多线程调用
+ */
 class JphpLauncher protected constructor() : Launcher() {
 
     companion object {
@@ -25,11 +29,9 @@ class JphpLauncher protected constructor() : Launcher() {
         /**
          * 线程独有的可复用的JphpLauncher
          */
-        protected val insts: ThreadLocal<JphpLauncher> = ThreadLocal.withInitial {
-            JphpLauncher()
-        }
+        protected val insts = JphpLauncher()
         public fun instance(): JphpLauncher {
-            return insts.get()
+            return insts
         }
 
         /**
