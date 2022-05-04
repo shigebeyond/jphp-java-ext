@@ -5,6 +5,7 @@ if(ext.has('env') && ext.env == 'dev'){
     dependencies {
         // other project
         compile project(':jkutil')
+        compile project(':jkguard')
 
         // jphp
         compile 'org.develnext.jphp:jphp-core:0.9.2' // include jphp with runtime and compiler
@@ -112,8 +113,9 @@ project(':') {
         compile 'org.jetbrains.kotlin:kotlin-reflect'
         //compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     
-        // jkutil
+        // 依赖
         compile "net.jkcode:jkutil:$jkutil_version"
+        compile "net.jkcode:jkguard:$jkguard_version"
 
         // jphp
         compile 'org.develnext.jphp:jphp-core:0.9.2' // include jphp with runtime and compiler
