@@ -3,10 +3,12 @@ package net.jkcode.jphp.ext
 import co.paralleluniverse.fibers.Suspendable
 import net.jkcode.jkguard.IMethodGuardInvoker
 import net.jkcode.jkguard.IMethodMeta
+import net.jkcode.jkutil.fiber.AsyncCompletionStage
 import php.runtime.Memory
 import php.runtime.memory.ObjectMemory
 import php.runtime.reflection.MethodEntity
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 /**
  * 基于php Method实现的方法元数据
@@ -75,7 +77,16 @@ class PhpMethodMeta(
      */
     @Suspendable
     override fun getResultFromFuture(resFuture: CompletableFuture<*>): Any?{
-        return method.getResultFromFuture(resFuture)
+
+        // 1 异步结果
+        // 由于php方法无法获得返回值类型, 因此使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 WrapCompletableFuture 的情况
+//        if(returnType == Future::class.java || returnType == CompletableFuture::class.java)
+        if(resFuture is PhpCompletableFuture)
+            return resFuture
+
+        // 2 同步结果
+        //return resFuture.get()
+        return AsyncCompletionStage.get(resFuture) // 支持协程
     }
 
     /**
@@ -92,9 +103,12 @@ class PhpMethodMeta(
      * 方法处理
      *   在IMethodGuardInvoker#invokeAfterGuard()中调用
      *   实现：server端实现是调用包装的原生方法, client端实现是发rpc请求
+     * @param obj php对象
+     * @param args php参数
+     * @return Memory
      */
     @Suspendable
     override fun invoke(obj: Any, vararg args: Any?): Any? {
-        return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.instance().environment, null, *(args as Array<Memory>))
+        return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.environment, null, *(args as Array<Memory>))
     }
 }

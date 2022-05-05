@@ -12,7 +12,7 @@ demo如下：
 import net.jkcode.jphp.ext.JphpLauncher
 
 // 执行 index.php 文件，并设置变量$name = "shi"
-JphpLauncher.instance().run("index.php" /* php 文件路径 */, mapOf("name" to "shi") /* 包含变量名与变量值的map */)
+JphpLauncher.run("index.php" /* php 文件路径 */, mapOf("name" to "shi") /* 包含变量名与变量值的map */)
 ```
 ## 2 增强对java对象的操作
 主要是实现`WrapJavaObject`，方便包装java对象，并在php中直接读写属性与调用方法
@@ -21,7 +21,7 @@ JphpLauncher.instance().run("index.php" /* php 文件路径 */, mapOf("name" to 
 ```
 @Test
 fun testJphpLauncher(){
-    val lan = JphpLauncher.instance()
+    val lan = JphpLauncher
     val data = mapOf(
             "name" to "shi",
             "maparray" to mapOf("age" to 11, "addr" to "nanning"), // 会转换php的array类型（即java的ArrayMemory）

@@ -13,43 +13,40 @@ import php.runtime.ext.java.JavaObject
 import php.runtime.launcher.LaunchException
 import php.runtime.launcher.Launcher
 import php.runtime.memory.ArrayMemory
+import php.runtime.memory.ObjectMemory
 import php.runtime.memory.support.MemoryUtils
 import php.runtime.reflection.support.ReflectionUtils
 import java.io.IOException
 import java.io.OutputStream
+import java.util.concurrent.CompletableFuture
 
 /**
  * jphp启动器
  *   environment默认是 ConcurrentEnvironment，支持多线程调用
  */
-class JphpLauncher protected constructor() : Launcher() {
+object JphpLauncher : Launcher() {
 
-    companion object {
+    // ---- 转换器 ----
+    // Memory -> java object的转换器: 用在php中调用java方法，在 WrapJavaObject / WrapReferer 等多个扩展类中用到但又不能写到某个扩展类中初始化(重复或漏)，因此统一写到这里来初始化
+    public val CONVERTERS: HashMap<Class<*>, MemoryUtils.Converter<*>> = MemoryUtils::class.java.getAccessibleField("CONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Converter<*>>
+    // java object -> Memory 的反转器: 用在将java对象暴露给php
+    public val UNCONVERTERS: HashMap<Class<*>, MemoryUtils.Unconverter<*>> = MemoryUtils::class.java.getAccessibleField("UNCONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Unconverter<*>>
+    private fun initConverters(){
+        // Memory -> java object: 添加 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
+        CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
+            override fun run(env: Environment, trace: TraceInfo, value: Memory): Any? {
+                return value.toJavaObject()
+            }
+        })
 
-        /**
-         * 线程独有的可复用的JphpLauncher
-         */
-        protected val insts = JphpLauncher()
-        public fun instance(): JphpLauncher {
-            return insts
-        }
-
-        /**
-         * Memory 转 java object的转换器，用在php中调用java方法，在 WrapJavaObject / WrapReferer 等多个扩展类中用到但又不能写到某个扩展类中初始化(重复或漏)，因此统一写到这里来初始化
-         */
-        public val CONVERTERS: HashMap<Class<*>, MemoryUtils.Converter<*>> = MemoryUtils::class.java.getAccessibleField("CONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Converter<*>>
-        init {
-            // 添加 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
-            CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
-                override fun run(env: Environment?, trace: TraceInfo?, value: Memory): Any? {
-                    return value.toJavaObject()
-                }
-            })
-        }
-
+        // java object -> Memory: 添加 Completable 类型的反转器
+        UNCONVERTERS.put(Any::class.java, object : MemoryUtils.Unconverter<CompletableFuture<Memory>> {
+            override fun run(value: CompletableFuture<Memory>): Memory {
+                return ObjectMemory(WrapCompletableFuture(environment, value))
+            }
+        })
     }
 
-    // 只初始化一次
     init {
         // 注册java对象， 方便调用java对象
         val core = compileScope.getExtension("Core")
@@ -78,6 +75,9 @@ class JphpLauncher protected constructor() : Launcher() {
         val classLoaderEntity = environment.fetchClass(classLoader)
         val loader = classLoaderEntity.newObject<WrapClassLoader>(environment, TraceInfo.UNKNOWN, true)
         environment.invokeMethod(loader, "register", Memory.TRUE)
+
+        // 初始转换器
+        initConverters()
     }
 
     /**
