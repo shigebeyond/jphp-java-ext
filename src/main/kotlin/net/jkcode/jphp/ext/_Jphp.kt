@@ -1,6 +1,7 @@
 package net.jkcode.jphp.ext
 
 import net.jkcode.jkguard.Map2AnnotationHandler
+import net.jkcode.jkguard.annotation.Degrade
 import net.jkcode.jkutil.common.associate
 import php.runtime.Memory
 import php.runtime.invoke.Invoker
@@ -139,6 +140,29 @@ private fun buildMethodAnnotation(annConfig: Map<String, Map<String, Any?>>): Ma
         clazz to ann
     }
 }
+
+/**
+ * 收集类中所有方法中的 @Degrade 注解中 fallbackMethod - 降级的方法
+ */
+public val ClassEntity.degradeFallbackMethods: List<String>
+    get(){
+        return this.getAdditionalData("degradeFallbackMethods", List::class.java){
+            methods.values.mapNotNull { m ->
+                val ann = m.annotations[Degrade::class.java] as Degrade?
+                ann?.fallbackMethod
+            }
+        } as List<String>
+    }
+
+/**
+ * 是否降级的方法
+ * @param method
+ * @return
+ */
+public fun ClassEntity.isDegradeFallbackMethod(method: String): Boolean{
+    return degradeFallbackMethods.contains(method)
+}
+
 
 /**
  * 获得php方法的注解
