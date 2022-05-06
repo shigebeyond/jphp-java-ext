@@ -19,8 +19,8 @@ import java.util.concurrent.Future
  */
 class PhpMethodMeta(
         protected val method: MethodEntity, // php方法
-        public override val handler: IMethodGuardInvoker // 带守护的方法调用者
-): IMethodMeta {
+        handler: IMethodGuardInvoker // 带守护的方法调用者
+): IMethodMeta(handler) {
 
     /**
      * 类名
@@ -93,7 +93,7 @@ class PhpMethodMeta(
      * @param name 兄弟方法名
      * @return
      */
-    override fun getBrotherMethod(name: String): IMethodMeta{
+    override fun getBrotherMethod(name: String): IMethodMeta {
         val brotherMethod = method.clazz.findMethod(name)
         return PhpMethodMeta(brotherMethod, handler)
     }
