@@ -100,19 +100,32 @@ public fun Invoker.callMemoryOrAny(vararg args: Any?): Memory? {
 /**
  * 某个php类的所有php方法的java注解
  *   要缓存到 ClassEntity 中
+ * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  */
 public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
     get(){
         return this.getAdditionalData("methodAnnotations", Map::class.java){
-            // 注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
-            val annProp = this.findStaticProperty("_methodAnnotations")
-            val annConfigs = annProp.getStaticValue(JphpLauncher.environment, null) as ArrayMemory
-            // 构建注解
-            annConfigs.toPureMap().associate { methodName, annConfig ->
-                methodName to buildMethodAnnotation(annConfig as Map<String, Map<String, Any?>>)
-            }
+            buildMethodAnnotations(this)
         } as Map<String, Map<Class<*>, Any>>
     }
+
+/**
+ * 构建某个php类的所有php方法的java注解
+ * @param clazz
+ * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+ */
+private fun buildMethodAnnotations(clazz: ClassEntity): Map<String, Map<Class<*>, Any>> {
+    // 注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+    val annProp = clazz.findStaticProperty("_methodAnnotations")
+    val annConfigs = annProp.getStaticValue(JphpLauncher.environment, null) as ReferenceMemory?
+    if(annConfigs == null || annConfigs.value is NullMemory)
+        return emptyMap()
+
+    // 构建注解
+    return (annConfigs.value as ArrayMemory).toPureMap().associate { methodName, annConfig ->
+        methodName to buildMethodAnnotation(annConfig as Map<String, Map<String, Any?>>)
+    }
+}
 
 /**
  * 构建单个php方法的注解

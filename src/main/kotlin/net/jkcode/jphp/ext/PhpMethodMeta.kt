@@ -77,7 +77,6 @@ class PhpMethodMeta(
      */
     @Suspendable
     override fun getResultFromFuture(resFuture: CompletableFuture<*>): Any?{
-
         // 1 异步结果
         // 由于php方法无法获得返回值类型, 因此使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 WrapCompletableFuture 的情况
 //        if(returnType == Future::class.java || returnType == CompletableFuture::class.java)
