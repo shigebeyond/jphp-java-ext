@@ -101,7 +101,7 @@ public fun Invoker.callMemoryOrAny(vararg args: Any?): Memory? {
 /**
  * 某个php类的所有php方法的java注解
  *   要缓存到 ClassEntity 中
- * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+ * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  */
 public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
     get(){
@@ -113,10 +113,10 @@ public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
 /**
  * 构建某个php类的所有php方法的java注解
  * @param clazz
- * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+ * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  */
 private fun buildMethodAnnotations(clazz: ClassEntity): Map<String, Map<Class<*>, Any>> {
-    // 注解配置： {方法名:{注解类名:{注解属性}}}, 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+    // 注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
     val annProp = clazz.findStaticProperty("_methodAnnotations")
     val annConfigs = annProp.getStaticValue(JphpLauncher.environment, null) as ReferenceMemory?
     if(annConfigs == null || annConfigs.value is NullMemory)
@@ -124,19 +124,25 @@ private fun buildMethodAnnotations(clazz: ClassEntity): Map<String, Map<Class<*>
 
     // 构建注解
     return (annConfigs.value as ArrayMemory).toPureMap().associate { methodName, annConfig ->
-        methodName to buildMethodAnnotation(annConfig as Map<String, Map<String, Any?>>)
+        methodName to buildMethodAnnotation(annConfig as Map<String, Any>)
     }
 }
 
 /**
  * 构建单个php方法的注解
- * @param annConfig 注解配置： {注解类名:{注解属性}}，如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
+ * @param annConfig 注解配置： {注解类名:{注解属性}}，注解属性在php中可能是空数组(List) 而非联合数组(Map)，如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  * @return Map<注解类, 注解实例>
  */
-private fun buildMethodAnnotation(annConfig: Map<String, Map<String, Any?>>): Map<Class<*>, Any> {
+private fun buildMethodAnnotation(annConfig: Map<String, Any>): Map<Class<*>, Any> {
     return annConfig.associate{ clazzName, attrs ->
         val clazz = Class.forName(clazzName) // 注解类
-        val ann = Map2AnnotationHandler.map2Annotation(clazz, attrs) // json转注解实例
+        // 注解属性
+        val realAttrs:Map<String, Any?>
+        if(attrs is List<*> && attrs.isEmpty()) // 注解属性在php中可能是空数组(List) 而非联合数组(Map)
+            realAttrs = emptyMap() // 给个空map
+        else
+            realAttrs = attrs as Map<String, Any?>
+        val ann = Map2AnnotationHandler.map2Annotation(clazz, realAttrs) // json转注解实例
         clazz to ann
     }
 }
