@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
  * @author shijianhang<772910474@qq.com>
  * @date 2022-4-27 7:25 PM
  */
-class PhpCompletableFuture(future: CompletableFuture<Memory>): CompletableFuture<Memory>() {
+class PhpCompletableFuture(future: CompletableFuture<Any?>): CompletableFuture<Any?>() {
 
     init {
         // 包装源future
@@ -32,7 +32,7 @@ class PhpCompletableFuture(future: CompletableFuture<Memory>): CompletableFuture
          * @param supplier 取值函数
          * @return
          */
-        public inline fun tryPhpSupplierFuture(supplier: () -> Memory): CompletableFuture<Memory> {
+        public inline fun tryPhpSupplierFuture(supplier: () -> Memory): CompletableFuture<Any?> {
             try{
                 // 调用取值函数
                 val result = supplier.invoke()
@@ -46,7 +46,7 @@ class PhpCompletableFuture(future: CompletableFuture<Memory>): CompletableFuture
                 // 同步结果
                 return CompletableFuture.completedFuture(result)
             }catch (r: Throwable){
-                val result2 = CompletableFuture<Memory>()
+                val result2 = CompletableFuture<Any?>()
                 result2.completeExceptionally(r)
                 return result2
             }

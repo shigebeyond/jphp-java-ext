@@ -40,8 +40,8 @@ object JphpLauncher : Launcher() {
         })
 
         // java object -> Memory: 添加 Completable 类型的反转器
-        UNCONVERTERS.put(Any::class.java, object : MemoryUtils.Unconverter<CompletableFuture<Memory>> {
-            override fun run(value: CompletableFuture<Memory>): Memory {
+        UNCONVERTERS.put(CompletableFuture::class.java, object : MemoryUtils.Unconverter<CompletableFuture<Any?>> {
+            override fun run(value: CompletableFuture<Any?>): Memory {
                 return ObjectMemory(WrapCompletableFuture(environment, value))
             }
         })
@@ -52,6 +52,7 @@ object JphpLauncher : Launcher() {
         val core = compileScope.getExtension("Core")
         compileScope.registerLazyClass(core, JavaObject::class.java)
         compileScope.registerLazyClass(core, WrapJavaObject::class.java)
+        compileScope.registerLazyClass(core, WrapCompletableFuture::class.java)
 
         // 配置
         readConfig()

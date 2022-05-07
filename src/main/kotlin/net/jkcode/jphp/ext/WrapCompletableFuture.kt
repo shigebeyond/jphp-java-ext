@@ -11,10 +11,12 @@ import java.util.concurrent.*
 
 /**
  * 包装 CompletableFuture 对象
- *    回调中使用 Invoker.callAny() 来将回调的java参数变为php参数
+ *    1 回调中使用 Invoker.callAny() 来将回调的java参数变为php参数
+ *    2 CompletableFuture.result 可能是java对象，因此get()需要将java对象转为php对象
+ *
  */
 @Reflection.Name("php\\lang\\CompletableFuture")
-class WrapCompletableFuture(env: Environment, public val future: CompletableFuture<Memory>) : BaseObject(env) {
+class WrapCompletableFuture(env: Environment, public val future: CompletableFuture<Any?>) : BaseObject(env) {
 
     // ---------------------- Future 方法扩展: 参考 WrapFuture ----------------------
     @Reflection.Signature
@@ -39,19 +41,26 @@ class WrapCompletableFuture(env: Environment, public val future: CompletableFutu
 
     @Reflection.Signature(Reflection.Arg(value = "timeout", optional = Reflection.Optional("NULL")))
     fun get(env: Environment, vararg args: Memory): Memory {
-        val v = if (args[0].isNull) future.get() else future[args[0].toLong(), TimeUnit.MILLISECONDS]
+        // 获得 CompletableFuture.result
+        val v = if (args[0].isNull)
+                    future.get()
+                else
+                    future.get(args[0].toLong(), TimeUnit.MILLISECONDS) // 有超时
+
+        // CompletableFuture.result 可能是java对象，因此需要将java对象转为php对象
         if(v == null)
             return Memory.NULL
-        return MemoryUtils.valueOf(env, v)
+        //return MemoryUtils.valueOf(env, v) // 有env参数，居然不转map/list
+        return MemoryUtils.valueOf(v)
     }
 
     // ---------------------- CompletableFuture 方法扩展 ----------------------
     @Reflection.Signature
     fun thenApply(env: Environment, invoker: Invoker): WrapCompletableFuture {
         val f = future.thenApply { v ->
-            invoker.callMemoryOrAny(v) ?: Memory.NULL
+            invoker.callMemoryOrAny(v)
         }
-        return WrapCompletableFuture(env, f)
+        return WrapCompletableFuture(env, f as CompletableFuture<Any?>)
     }
 
     @Reflection.Signature
