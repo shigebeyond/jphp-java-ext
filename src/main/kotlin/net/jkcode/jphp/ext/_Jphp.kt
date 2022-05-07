@@ -18,8 +18,8 @@ import java.util.*
  */
 public inline fun Any?.toMemory(): Memory {
     return when(this) {
-        null -> NullMemory.INSTANCE
-        is Boolean -> if(this) TrueMemory.INSTANCE else FalseMemory.INSTANCE
+        null -> Memory.NULL
+        is Boolean -> if(this) Memory.TRUE else Memory.FALSE
         is Int -> LongMemory(this.toLong())
         is Long -> LongMemory(this)
         is Short -> LongMemory(this.toLong())

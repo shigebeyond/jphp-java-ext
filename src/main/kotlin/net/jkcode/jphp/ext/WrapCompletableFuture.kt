@@ -49,7 +49,7 @@ class WrapCompletableFuture(env: Environment, public val future: CompletableFutu
     @Reflection.Signature
     fun thenApply(env: Environment, invoker: Invoker): WrapCompletableFuture {
         val f = future.thenApply { v ->
-            invoker.callMemoryOrAny(v) ?: NullMemory.INSTANCE
+            invoker.callMemoryOrAny(v) ?: Memory.NULL
         }
         return WrapCompletableFuture(env, f)
     }
