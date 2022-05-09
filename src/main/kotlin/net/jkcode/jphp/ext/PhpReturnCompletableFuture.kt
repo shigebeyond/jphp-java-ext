@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
  * @author shijianhang<772910474@qq.com>
  * @date 2022-4-27 7:25 PM
  */
-class PhpCompletableFuture(future: CompletableFuture<Any?>): CompletableFuture<Any?>() {
+class PhpReturnCompletableFuture(future: CompletableFuture<Any?>): CompletableFuture<Any?>() {
 
     init {
         // 包装源future
@@ -40,7 +40,7 @@ class PhpCompletableFuture(future: CompletableFuture<Any?>): CompletableFuture<A
                 // 异步结果: 使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 WrapCompletableFuture 的情况
                 if(result is ObjectMemory && result.value is WrapCompletableFuture) {
                     val f = (result.value as WrapCompletableFuture).future
-                    return PhpCompletableFuture(f)
+                    return PhpReturnCompletableFuture(f)
                 }
 
                 // 同步结果

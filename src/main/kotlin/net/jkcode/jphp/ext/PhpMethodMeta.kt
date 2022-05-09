@@ -8,7 +8,6 @@ import php.runtime.Memory
 import php.runtime.memory.ObjectMemory
 import php.runtime.reflection.MethodEntity
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Future
 
 /**
  * 基于php Method实现的方法元数据
@@ -80,7 +79,7 @@ class PhpMethodMeta(
         // 1 异步结果
         // 由于php方法无法获得返回值类型, 因此使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 WrapCompletableFuture 的情况
 //        if(returnType == Future::class.java || returnType == CompletableFuture::class.java)
-        if(resFuture is PhpCompletableFuture)
+        if(resFuture is PhpReturnCompletableFuture)
             return resFuture
 
         // 2 同步结果
