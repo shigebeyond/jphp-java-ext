@@ -3,6 +3,7 @@ package net.jkcode.jphp.ext
 import net.jkcode.jkguard.Map2AnnotationHandler
 import net.jkcode.jkguard.annotation.Degrade
 import net.jkcode.jkutil.common.associate
+import net.jkcode.jkutil.common.getAccessibleField
 import php.runtime.Memory
 import php.runtime.invoke.Invoker
 import php.runtime.lang.ForeachIterator
@@ -10,8 +11,10 @@ import php.runtime.lang.IObject
 import php.runtime.memory.*
 import php.runtime.reflection.ClassEntity
 import php.runtime.reflection.MethodEntity
+import php.runtime.reflection.support.Entity
 import java.util.*
 
+/****************************** Memory转换 *******************************/
 /**
  * 将java对象转换为jphp的Memory
  * @return
@@ -79,6 +82,13 @@ fun ArrayMemory.toPureArray(): List<Any?> {
 }
 
 /**
+ * 获得属性java值
+ */
+public fun ObjectMemory.getPropJavaValue(name: String): Any? {
+    return getPropValue(name)?.toJavaObject()
+}
+
+/**
  * 根据参数来确定是二选一调用
  *   1 call(Memory): 参数是php对象
  *   2 callAny(Any): 参数是java对象
@@ -98,9 +108,36 @@ public fun Invoker.callMemoryOrAny(vararg args: Any?): Memory? {
     return this.callAny(args)
 }
 
+/****************************** ClassEntity扩展 *******************************/
+
+// php.runtime.reflection.support.Entity.additionalData 属性
+private val additionalDataField = Entity::class.java.getAccessibleField("additionalData")!!
+
+/**
+ * 获得additionalData
+ */
+public val Entity.additionalData: MutableMap<String, Any?>
+    get() = additionalDataField.get(this) as MutableMap<String, Any?>
+
+/**
+ * 标记php类注销
+ */
+public fun ClassEntity.markUnregistered(){
+    this.additionalData["unregistered"] = true
+}
+
+/**
+ * 检查php类注销
+ */
+public val ClassEntity.isUnregistered: Boolean
+    get(){
+        return (this.additionalData["unregistered"] as Boolean?)
+                ?: false
+    }
+
 /**
  * 某个php类的所有php方法的java注解
- *   要缓存到 ClassEntity 中
+ *   要缓存到 ClassEntity 中, 1是提高性能 2 是应对php类卸载
  * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  */
 public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
@@ -112,6 +149,7 @@ public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
 
 /**
  * 构建某个php类的所有php方法的java注解
+ *   放在静态属性 _methodAnnotations
  * @param clazz
  * @return 所有方法的注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
  */
@@ -149,6 +187,7 @@ private fun buildMethodAnnotation(annConfig: Map<String, Any>): Map<Class<*>, An
 
 /**
  * 收集类中所有方法中的 @Degrade 注解中 fallbackMethod - 降级的方法
+ *   要缓存到 ClassEntity 中, 1是提高性能 2 是应对php类卸载
  */
 public val ClassEntity.degradeFallbackMethods: List<String>
     get(){
@@ -185,11 +224,4 @@ public fun ObjectMemory.getPropValue(name: String): Memory? {
     val classEntity: ClassEntity = this.value.reflection
     val prop = classEntity.findProperty(name)
     return prop.getValue(JphpLauncher.environment, null, this.value)
-}
-
-/**
- * 获得属性java值
- */
-public fun ObjectMemory.getPropJavaValue(name: String): Any? {
-    return getPropValue(name)?.toJavaObject()
 }

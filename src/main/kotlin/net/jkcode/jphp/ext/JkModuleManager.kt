@@ -1,6 +1,5 @@
 package net.jkcode.jphp.ext
 
-import net.jkcode.jkutil.common.commonLogger
 import net.jkcode.jkutil.common.getAccessibleField
 import php.runtime.env.CompileScope
 import php.runtime.env.Environment
@@ -63,7 +62,8 @@ fun CompileScope.unregisterModule(name: String): ModuleEntity? {
     // 删除模块相关的类、方法、常量
     for (entity in module.classes) {
         if (entity.isStatic) {
-            classMap.remove(entity.lowerName)
+            val clazz = classMap.remove(entity.lowerName)
+            clazz?.markUnregistered() // 标记php类注销
         }
     }
     for (entity in module.functions) {
