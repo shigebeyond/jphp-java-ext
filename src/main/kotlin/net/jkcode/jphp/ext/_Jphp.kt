@@ -51,7 +51,7 @@ public fun Memory.toJavaObject(): Any? {
         is LongMemory -> this.value
         is DoubleMemory -> this.toDouble()
         is StringMemory -> this.toString()
-        is ArrayMemory -> if(this.isMap()) this.toPureMap() else this.toPureArray() // 递归调用
+        is ArrayMemory -> if(this.isMap()) this.toPureMap() else this.toPureList() // 递归调用
         is ObjectMemory -> this.value
         is ReferenceMemory -> this.value.toJavaObject() // 递归
         else -> throw IllegalArgumentException("Cannot auto convert [$this] into JavaObject")
@@ -75,7 +75,7 @@ fun ArrayMemory.toPureMap(): Map<String, Any?> {
 /**
  * ArrayMemory 转纯粹的java list
  */
-fun ArrayMemory.toPureArray(): List<Any?> {
+fun ArrayMemory.toPureList(): List<Any?> {
     return this.map {
         it.toJavaObject() // 递归调用
     }
@@ -156,7 +156,7 @@ public val ClassEntity.methodAnnotations: Map<String, Map<Class<*>, Any>>
 private fun buildMethodAnnotations(clazz: ClassEntity): Map<String, Map<Class<*>, Any>> {
     // 注解配置： {方法名:{注解类名:{注解属性}}}，注解属性在php中可能是空数组(List) 而非联合数组(Map), 其中 注解类名:{注解属性} 如 "net.jkcode.jkguard.annotation.GroupCombine":{"batchMethod":"listUsersByNameAsync","reqArgField":"name","respField":"","one2one":"true","flushQuota":"100","flushTimeoutMillis":"100"}
     val annProp = clazz.findStaticProperty("_methodAnnotations")
-    val annConfigs = annProp.getStaticValue(JphpLauncher.environment, null) as ReferenceMemory?
+    val annConfigs = annProp?.getStaticValue(JphpLauncher.environment, null) as ReferenceMemory?
     if(annConfigs == null || annConfigs.value is NullMemory)
         return emptyMap()
 
