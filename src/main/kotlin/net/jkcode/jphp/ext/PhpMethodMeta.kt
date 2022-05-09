@@ -94,7 +94,7 @@ class PhpMethodMeta(
      * @return
      */
     override fun getBrotherMethod(name: String): IMethodMeta {
-        val brotherMethod = method.clazz.findMethod(name)
+        val brotherMethod = method.clazz.findMethod(name.toLowerCase())
         return PhpMethodMeta(brotherMethod, handler)
     }
 
