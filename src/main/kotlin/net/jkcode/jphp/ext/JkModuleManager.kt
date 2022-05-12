@@ -10,7 +10,9 @@ import php.runtime.reflection.ModuleEntity
 import java.io.File
 
 /**
- * 改写 ModuleManager.fetchModule(), 支持在卸载模块时, 也卸载模块的类/函数/常量
+ * 改写 ModuleManager.fetchModule()
+ *   1 支持在卸载模块时, 也卸载模块的类/函数/常量
+ *   2 TODO： 时间变了，但内容没变，增加md5(代码)的检查
  */
 class JkModuleManager(env: Environment): ModuleManager(env) {
 

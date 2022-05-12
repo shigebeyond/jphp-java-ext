@@ -18,6 +18,13 @@ import java.util.concurrent.*
 @Reflection.Name("php\\lang\\CompletableFuture")
 class WrapCompletableFuture(env: Environment, public val future: CompletableFuture<Any?>) : BaseObject(env) {
 
+    init{
+        // 调试用
+        future.exceptionally { ex ->
+            ex.printStackTrace()
+        }
+    }
+
     // ---------------------- Future 方法扩展: 参考 WrapFuture ----------------------
     @Reflection.Signature
     private fun __construct(env: Environment, vararg args: Memory): Memory {
