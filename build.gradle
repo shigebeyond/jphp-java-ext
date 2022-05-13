@@ -1,6 +1,6 @@
 //公共库自己不要设置env变量, 由引用库来设置, 否则会覆盖evn变量
 // 引用库只需要依赖配置
-println ext.has('env')
+// println ext.has('env')
 if(ext.has('env') && ext.env == 'dev'){
     dependencies {
         // other project
