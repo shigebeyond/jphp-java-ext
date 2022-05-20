@@ -22,7 +22,10 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * jphp启动器
- *   environment默认是 ConcurrentEnvironment，支持多线程调用
+ *   1. 支持执行指定php文件，并输出到指定流
+ *   2. 注册类 WrapJavaObject、WrapCompletableFuture
+ *   3. 初始通用的转换器
+ *   4. 多线程支持：environment默认是 ConcurrentEnvironment，支持多线程调用
  */
 object JphpLauncher : Launcher() {
 
@@ -82,7 +85,7 @@ object JphpLauncher : Launcher() {
     }
 
     /**
-     * 执行php文件
+     * 执行指定php文件，并输出到指定流
      * @param bootstrapFile php入口文件
      * @param args 参数
      * @param out 输出流
