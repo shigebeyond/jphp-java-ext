@@ -64,9 +64,24 @@ $pojo->key = 'title2'; // 写属性，先尝试调用setter方法，然后写属
 echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属性
 ```
 
-## 3 性能最好的模板引擎
+## 3 支持php文件的重载
+包含以下支持
+1. 检测文件变化
+2. 卸载旧php文件的模块/类/方法等
+3. 加载新php文件的模块/类/方法等
 
-### 3.1 性能对比
+## 4 整合到jkguard库
+抽象 `IMethodMeta` 体系, 以便兼容java方法与php方法(见`PhpMethodMeta`), 进而整合进 jkguard(熔断降级限流) 的守护体系中, 从而能守护java与php方法
+
+## 5. 整合到jkmvc框架
+支持php写controller
+
+## 6. 整合到jksoa框架
+支持php调用rpc服务
+
+## 6 性能最好的模板引擎
+
+### 6.1 性能对比
 针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试。
 
 1. 测试思路
@@ -82,7 +97,7 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 ```
 => jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
-### 3.2 附上3个模板引擎对应的测试模板代码
+### 6.2 附上3个模板引擎对应的测试模板代码
 1. jphp引擎：
 test.php
 ```
