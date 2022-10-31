@@ -56,6 +56,7 @@ object JphpLauncher : Launcher() {
         compileScope.registerLazyClass(core, JavaObject::class.java)
         compileScope.registerLazyClass(core, WrapJavaObject::class.java)
         compileScope.registerLazyClass(core, WrapCompletableFuture::class.java)
+        compileScope.registerLazyClass(core, WrapCache::class.java)
 
         // 配置
         readConfig()

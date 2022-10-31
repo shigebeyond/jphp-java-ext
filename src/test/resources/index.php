@@ -14,6 +14,11 @@ $file = new File('/ohome/shi/code/jphp/jphp/sandbox/src/JPHP-INF/launcher.conf')
 echo "$file \n";
 echo 'exist: '. $file->exists() . "\n";
 
+// 缓存操作
+use php\lang\WrapCache;
+$cache = new WrapCache("jedis");
+$cache->set("key", "xxxx");
+echo $cache->get("key");
 
 // java对象创建+调用
 use php\lang\JavaClass;
