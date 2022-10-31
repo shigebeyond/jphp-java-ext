@@ -18,6 +18,7 @@ import php.runtime.memory.support.MemoryUtils
 import php.runtime.reflection.support.ReflectionUtils
 import java.io.IOException
 import java.io.OutputStream
+import java.util.*
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -35,14 +36,40 @@ object JphpLauncher : Launcher() {
     // java object -> Memory 的反转器: 用在将java对象暴露给php
     public val UNCONVERTERS: HashMap<Class<*>, MemoryUtils.Unconverter<*>> = MemoryUtils::class.java.getAccessibleField("UNCONVERTERS")!!.get(null) as HashMap<Class<*>, MemoryUtils.Unconverter<*>>
     private fun initConverters(){
-        // Memory -> java object: 添加 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
-        CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
-            override fun run(env: Environment, trace: TraceInfo, value: Memory): Any? {
-                return value.toJavaObject()
+        // 1 Memory -> java object
+        /* 下面的 value.toJavaObject() 已包含List/Map等转换
+        // 1.1 添加 List 类型转换器
+        CONVERTERS.put(List::class.java, object : MemoryUtils.Converter<List<*>>() {
+            override fun run(env: Environment?, trace: TraceInfo?, value: Memory): List<*> {
+                // 检查是否数组
+                if (value !is ArrayMemory)
+                    throw IllegalArgumentException("Cannot convert php object [$value] to java List")
+
+                // 逐个元素转java对象
+                return value.toPureList()
             }
         })
 
-        // java object -> Memory: 添加 Completable 类型的反转器
+        // 1.2 添加 Map 类型转换器
+        CONVERTERS.put(Map::class.java, object : MemoryUtils.Converter<Map<*, *>>() {
+            override fun run(env: Environment?, trace: TraceInfo?, value: Memory): Map<*, *> {
+                // 检查是否数组
+                if (value !is ArrayMemory)
+                    throw IllegalArgumentException("Cannot convert php object [$value] to java Map")
+
+                return value.toPureMap()
+            }
+        })*/
+
+        // 1.3 添加默认 object 类型的转换器，否则由于找不到 object 类型的转换器导致直接将实参值转换为null, 如 Hashmap 的 put(Object key, Object value) 方法, 在php调用 map.put('price', 11)时到java就变成 map.put(null, null)
+        CONVERTERS.put(Any::class.java, object : MemoryUtils.Converter<Any?>() {
+            override fun run(env: Environment?, trace: TraceInfo?, value: Memory): Any? {
+                return value.toJavaObject() // 转java对象, 包含List/Map等转换
+            }
+        })
+
+        // 2 java object -> Memory
+        // 2.1 添加 Completable 类型的反转器
         UNCONVERTERS.put(CompletableFuture::class.java, object : MemoryUtils.Unconverter<CompletableFuture<Any?>> {
             override fun run(value: CompletableFuture<Any?>): Memory {
                 return ObjectMemory(WrapCompletableFuture(environment, value))

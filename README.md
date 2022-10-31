@@ -78,11 +78,11 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 ## 5 整合到jkmvc框架
 支持php写controller
 
-详见[jkmvc整合jphp](https://github.com/shigebeyond/jkmvc/blob/master/doc/jphp/getting_started.md)
+详见[jkmvc整合jphp](https://github.com/shigebeyond/jkmvc/blob/master/doc/http/jphp.cn.md)
 
 ## 6 整合到jksoa框架
 支持php调用rpc服务
-详见[jksoa整合jphp](https://github.com/shigebeyond/jksoa/blob/master/doc/jphp/getting_started.md)
+详见[jksoa整合jphp](https://github.com/shigebeyond/jksoa/blob/master/doc/rpc/client/jphp.md)
 
 ## 7 性能最好的模板引擎
 
