@@ -98,7 +98,7 @@ class PhpMethodMeta(
     }
 
     /**
-     * 方法处理
+     * php方法调用
      *   在server端的IMethodGuardInvoker#invokeAfterGuard()/两端的降级处理中调用
      *   实现：server端实现是调用包装的本地方法, client端实现是发rpc请求
      * @param obj php对象
@@ -107,6 +107,7 @@ class PhpMethodMeta(
      */
     @Suspendable
     override fun invoke(obj: Any, vararg args: Any?): Any? {
+        // 调用php方法
         return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.environment, null, *(args as Array<Memory>))
     }
 }
