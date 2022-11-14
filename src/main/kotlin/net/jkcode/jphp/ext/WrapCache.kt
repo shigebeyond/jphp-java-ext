@@ -115,7 +115,7 @@ open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObj
         @Reflection.Signature
         @JvmStatic
         fun instance(env: Environment, name: String = "jedis"): Memory {
-            val cache = WrapCache(env, env.fetchClass("php\\lang\\WrapCache"))
+            val cache = WrapCache(env, env.fetchClass("php\\lang\\Cache"))
             cache.name = name
             return ObjectMemory(cache)
         }

@@ -1,7 +1,6 @@
 package net.jkcode.jphp.ext
 
 import net.jkcode.jkutil.common.getMethodByName
-import net.jkcode.jkutil.common.ucFirst
 import php.runtime.Memory
 import php.runtime.annotation.Reflection
 import php.runtime.env.Environment
@@ -75,43 +74,13 @@ open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<Ja
         return Memory.NULL
     }
 
-    /**
-     * 调用getter
-     */
-    protected fun call_getter(env: Environment, field: String): Memory? {
-        // 获得方法
-        val name = "get" + field.ucFirst()
-        val method = obj.javaClass.getMethodByName(name)
-        if (method == null)
-            return null
-        // 用 JavaMethod 包装方法调用
-        val method2 = JavaMethod.of(env, method)
-        val obj2 = ObjectMemory(JavaObject.of(env, obj)) // 第一个参数是被包装的java对象
-        return method2.invoke(env, obj2)
-    }
-
-    /**
-     * 调用setter
-     */
-    protected fun call_setter(env: Environment, field: String, value: Memory): Memory? {
-        // 获得方法
-        val name = "set" + field.ucFirst()
-        val method = obj.javaClass.getMethodByName(name)
-        if (method == null)
-            return null
-        // 用 JavaMethod 包装方法调用
-        val method2 = JavaMethod.of(env, method)
-        val obj2 = ObjectMemory(JavaObject.of(env, obj)) // 第一个参数是被包装的java对象
-        return method2.invoke(env, obj2, value)
-    }
-
     // ---------------- 改进final类JavaObject实现，属性读写先调动getter/setter ---------------
     @Reflection.Signature(Reflection.Arg("name"))
     fun __get(env: Environment, vararg args: Memory): Memory {
         val name = args[0].toString()
 
         // 1 先尝试调用getter
-        val v = call_getter(env, name)
+        val v = call_getter(env, obj, name)
         if(v != null)
             return v
 
@@ -132,7 +101,7 @@ open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<Ja
     fun __set(env: Environment, vararg args: Memory): Memory {
         val name = args[0].toString()
         // 1 先尝试调用setter
-        val v = call_setter(env, name, args[1])
+        val v = call_setter(env, obj, name, args[1])
         if(v != null)
             return v
 

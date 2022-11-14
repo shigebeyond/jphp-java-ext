@@ -4,7 +4,12 @@ import net.jkcode.jkguard.Map2AnnotationHandler
 import net.jkcode.jkguard.annotation.Degrade
 import net.jkcode.jkutil.common.associate
 import net.jkcode.jkutil.common.getAccessibleField
+import net.jkcode.jkutil.common.getMethodByName
+import net.jkcode.jkutil.common.ucFirst
 import php.runtime.Memory
+import php.runtime.env.Environment
+import php.runtime.ext.java.JavaMethod
+import php.runtime.ext.java.JavaObject
 import php.runtime.invoke.Invoker
 import php.runtime.lang.ForeachIterator
 import php.runtime.lang.IObject
@@ -13,6 +18,38 @@ import php.runtime.reflection.ClassEntity
 import php.runtime.reflection.MethodEntity
 import php.runtime.reflection.support.Entity
 import java.util.*
+
+/****************************** getter/setter *******************************/
+
+/**
+ * 调用getter
+ */
+public fun call_getter(env: Environment, obj: Any, field: String): Memory? {
+    // 获得方法
+    val name = "get" + field.ucFirst()
+    val method = obj.javaClass.getMethodByName(name)
+    if (method == null)
+        return null
+    // 用 JavaMethod 包装方法调用
+    val method2 = JavaMethod.of(env, method)
+    val obj2 = ObjectMemory(JavaObject.of(env, obj)) // 第一个参数是被包装的java对象
+    return method2.invoke(env, obj2)
+}
+
+/**
+ * 调用setter
+ */
+public fun call_setter(env: Environment, obj: Any, field: String, value: Memory): Memory? {
+    // 获得方法
+    val name = "set" + field.ucFirst()
+    val method = obj.javaClass.getMethodByName(name)
+    if (method == null)
+        return null
+    // 用 JavaMethod 包装方法调用
+    val method2 = JavaMethod.of(env, method)
+    val obj2 = ObjectMemory(JavaObject.of(env, obj)) // 第一个参数是被包装的java对象
+    return method2.invoke(env, obj2, value)
+}
 
 /****************************** Memory转换 *******************************/
 /**
