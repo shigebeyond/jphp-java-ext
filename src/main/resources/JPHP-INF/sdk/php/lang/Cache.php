@@ -2,10 +2,10 @@
 namespace php\lang;
 
 /**
- * Class WrapCache
+ * Class Cache
  * @packages std, core
  */
-class WrapCache
+class Cache
 {
 
     /**

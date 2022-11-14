@@ -20,11 +20,10 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 包装cache
- *    java中的实例化： val cache = WrapCache.of(env, "jedis")
- *    php中的实例化: $cache = new WrapCache("jedis");
+ *    php中的实例化: $cache = Cache::instance("jedis");
  *    php中的方法调用: $cache->get("key");
  */
-@Reflection.Name("php\\lang\\WrapCache")
+@Reflection.Name("php\\lang\\Cache")
 open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
 
     // 缓存配置名
@@ -33,7 +32,7 @@ open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObj
     /**
      * 代理的缓存
      */
-    val proxyCache: ICache by lazy {
+    val proxyCache: ICache by lazy{
         ICache.instance(name)
     }
 
@@ -111,13 +110,15 @@ open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObj
         proxyCache.clear()
     }
 
-
     companion object {
-        // 创建 WrapCache 实例
-        fun of(env: Environment, name: String = "jedis"): WrapCache {
+
+        @Reflection.Signature
+        @JvmStatic
+        fun instance(env: Environment, name: String = "jedis"): Memory {
             val cache = WrapCache(env, env.fetchClass("php\\lang\\WrapCache"))
             cache.name = name
-            return cache
+            return ObjectMemory(cache)
         }
     }
+
 }

@@ -15,8 +15,8 @@ echo "$file \n";
 echo 'exist: '. $file->exists() . "\n";
 
 // 缓存操作
-use php\lang\WrapCache;
-$cache = new WrapCache("jedis");
+use php\lang\Cache;
+$cache = Cache::instance("jedis");
 $cache->set("key", "xxxx");
 echo $cache->get("key");
 
