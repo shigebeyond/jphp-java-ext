@@ -2,10 +2,7 @@ package net.jkcode.jphp.ext
 
 import net.jkcode.jkguard.Map2AnnotationHandler
 import net.jkcode.jkguard.annotation.Degrade
-import net.jkcode.jkutil.common.associate
-import net.jkcode.jkutil.common.getAccessibleField
-import net.jkcode.jkutil.common.getMethodByName
-import net.jkcode.jkutil.common.ucFirst
+import net.jkcode.jkutil.common.*
 import php.runtime.Memory
 import php.runtime.env.Environment
 import php.runtime.ext.java.JavaMethod
@@ -98,11 +95,11 @@ public fun Memory.toJavaObject(): Any? {
 /**
  * ArrayMemory 转纯粹的java map
  */
-fun ArrayMemory.toPureMap(): Map<String, Any?> {
-    val r: MutableMap<String, Any?> = LinkedHashMap()
+fun ArrayMemory.toPureMap(): Map<Any, Any?> {
+    val r: MutableMap<Any, Any?> = LinkedHashMap()
     val iterator: ForeachIterator = foreachIterator(false, false)
     while (iterator.next()) {
-        val key = iterator.key.toString()
+        val key = iterator.key
         val value = iterator.value.toJavaObject() // 递归调用
         r[key] = value
     }
@@ -115,6 +112,15 @@ fun ArrayMemory.toPureMap(): Map<String, Any?> {
 fun ArrayMemory.toPureList(): List<Any?> {
     return this.map {
         it.toJavaObject() // 递归调用
+    }
+}
+
+/**
+ * ArrayMemory 转纯粹的java array
+ */
+fun ArrayMemory.toPureArray(): Array<Any?> {
+    return this.iterator().mapToArray(this.size()){
+        it.toJavaObject()
     }
 }
 
@@ -200,7 +206,7 @@ private fun buildMethodAnnotations(clazz: ClassEntity): Map<String, Map<Class<*>
     // 构建注解
     return (annConfigs.value as ArrayMemory).toPureMap().associate { methodName, annConfig ->
         methodName to buildMethodAnnotation(annConfig as Map<String, Any>)
-    }
+    } as Map<String, Map<Class<*>, Any>>
 }
 
 /**
