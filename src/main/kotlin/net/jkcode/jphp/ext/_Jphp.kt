@@ -95,7 +95,10 @@ public fun Memory.toJavaObject(): Any? {
 /**
  * ArrayMemory 转纯粹的java map
  */
-fun ArrayMemory.toPureMap(): Map<Any, Any?> {
+fun ArrayMemory?.toPureMap(): Map<Any, Any?> {
+    if (this == null || this.size() == 0)
+        return emptyMap()
+
     val r: MutableMap<Any, Any?> = LinkedHashMap()
     val iterator: ForeachIterator = foreachIterator(false, false)
     while (iterator.next()) {
@@ -109,7 +112,10 @@ fun ArrayMemory.toPureMap(): Map<Any, Any?> {
 /**
  * ArrayMemory 转纯粹的java list
  */
-fun ArrayMemory.toPureList(): List<Any?> {
+fun ArrayMemory?.toPureList(): List<Any?> {
+    if (this == null || this.size() == 0)
+        return emptyList()
+
     return this.map {
         it.toJavaObject() // 递归调用
     }
@@ -118,7 +124,10 @@ fun ArrayMemory.toPureList(): List<Any?> {
 /**
  * ArrayMemory 转纯粹的java array
  */
-fun ArrayMemory.toPureArray(): Array<Any?> {
+fun ArrayMemory?.toPureArray(): Array<Any?> {
+    if (this == null || this.size() == 0)
+        return emptyArray()
+
     return this.iterator().mapToArray(this.size()){
         it.toJavaObject()
     }
