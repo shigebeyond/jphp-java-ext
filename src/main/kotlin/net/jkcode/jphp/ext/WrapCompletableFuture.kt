@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit
 class WrapCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
 
     constructor(env: Environment, wrappedObject: CompletableFuture<Any?>) : super(env, wrappedObject) {}
+
+    constructor(env: Environment, wrappedObject: PhpReturnCompletableFuture) : super(env, wrappedObject) {}
+    
     constructor(env: Environment, clazz: ClassEntity) : super(env, clazz) {}
 
     public val future: CompletableFuture<Any?>
