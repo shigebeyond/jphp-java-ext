@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture
 class PhpMethodMeta(
         protected val method: MethodEntity, // php方法
         handler: IMethodGuardInvoker // 带守护的方法调用者
-): IMethodMeta(handler) {
+): IMethodMeta<Memory>(handler) {
 
     /**
      * 类名
@@ -92,7 +92,7 @@ class PhpMethodMeta(
      * @param name 兄弟方法名
      * @return
      */
-    override fun getBrotherMethod(name: String): IMethodMeta {
+    override fun getBrotherMethod(name: String): IMethodMeta<Memory> {
         val brotherMethod = method.clazz.findMethod(name.toLowerCase())
         return PhpMethodMeta(brotherMethod, handler)
     }
@@ -106,7 +106,7 @@ class PhpMethodMeta(
      * @return Memory
      */
     @Suspendable
-    override fun invoke(obj: Any, vararg args: Any?): Any? {
+    override fun invoke(obj: Any, vararg args: Any?): Memory {
         // 调用php方法
         return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.environment, null, *(args as Array<Memory>))
     }
