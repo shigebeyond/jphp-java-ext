@@ -89,6 +89,7 @@ object JphpLauncher : Launcher() {
         // 原因: MemoryOperation 转换器中没包含 CompletableFuture 类型转换
         // 解决: 参考实现 extend.registerWrapperClass(scope, CompletableFuture::class.java, WrapCompletableFuture::class.java)
          MemoryOperation.registerWrapper(CompletableFuture::class.java, WrapCompletableFuture::class.java);
+         MemoryOperation.registerWrapper(PhpReturnCompletableFuture::class.java, WrapCompletableFuture::class.java);
 
         // 配置
         readConfig()
@@ -119,6 +120,8 @@ object JphpLauncher : Launcher() {
 
     /**
      * 执行指定php文件，并输出到指定流
+     *    php执行结果有可能是WrapCompletableFuture, 直接返回future, 以便调用端处理异步结果
+     *
      * @param bootstrapFile php入口文件
      * @param args 参数
      * @param out 输出流
@@ -176,7 +179,10 @@ object JphpLauncher : Launcher() {
 
         try {
             // include 执行
-            return bootstrap.include(environment, locals)?.toJavaObject()
+            val ret = bootstrap.include(environment, locals)?.toJavaObject()
+            if(ret is WrapCompletableFuture) // 返回值有可能是future包装器, 直接返回future, 以便调用端处理异步结果
+                return ret.future
+            return ret
         } finally {
             // 恢复原来的异常处理器
             if(exceptionHandler != null)
