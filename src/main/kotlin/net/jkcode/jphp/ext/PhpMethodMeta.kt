@@ -70,7 +70,7 @@ class PhpMethodMeta(
 
     /**
      * 从CompletableFuture获得方法结果值
-     *
+     *    同步结果值有可能是null或java对象
      * @param resFuture
      * @return
      */

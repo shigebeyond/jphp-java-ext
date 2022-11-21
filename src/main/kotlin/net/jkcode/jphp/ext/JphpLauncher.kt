@@ -14,6 +14,7 @@ import php.runtime.launcher.LaunchException
 import php.runtime.launcher.Launcher
 import php.runtime.memory.ArrayMemory
 import php.runtime.memory.ObjectMemory
+import php.runtime.memory.support.MemoryOperation
 import php.runtime.memory.support.MemoryUtils
 import php.runtime.reflection.support.ReflectionUtils
 import java.io.IOException
@@ -82,8 +83,12 @@ object JphpLauncher : Launcher() {
         val core = compileScope.getExtension("Core")
         compileScope.registerLazyClass(core, JavaObject::class.java)
         compileScope.registerLazyClass(core, WrapJavaObject::class.java)
-        compileScope.registerLazyClass(core, WrapCompletableFuture::class.java)
         compileScope.registerLazyClass(core, WrapCache::class.java)
+        compileScope.registerLazyClass(core, WrapCompletableFuture::class.java)
+        // bug: php.runtime.reflection.CompileMethodEntity$CompileMethod$Method.setParameters(CompileMethodEntity.java:314) 报错 Unsupported type for binding - class java.util.concurrent.CompletableFuture in net.jkcode.jkmvc.http.jphp.PHttpRequest.transferAndReturn
+        // 原因: MemoryOperation 转换器中没包含 CompletableFuture 类型转换
+        // 解决: 参考实现 extend.registerWrapperClass(scope, CompletableFuture::class.java, WrapCompletableFuture::class.java)
+         MemoryOperation.registerWrapper(CompletableFuture::class.java, WrapCompletableFuture::class.java);
 
         // 配置
         readConfig()
@@ -171,7 +176,7 @@ object JphpLauncher : Launcher() {
 
         try {
             // include 执行
-            return bootstrap.includeNoThrow(environment, locals)?.toJavaObject()
+            return bootstrap.include(environment, locals)?.toJavaObject()
         } finally {
             // 恢复原来的异常处理器
             if(exceptionHandler != null)

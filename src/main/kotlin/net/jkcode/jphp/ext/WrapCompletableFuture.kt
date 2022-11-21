@@ -4,10 +4,11 @@ import php.runtime.Memory
 import php.runtime.annotation.Reflection
 import php.runtime.env.Environment
 import php.runtime.invoke.Invoker
-import php.runtime.lang.BaseObject
-import php.runtime.memory.NullMemory
+import php.runtime.lang.BaseWrapper
 import php.runtime.memory.support.MemoryUtils
-import java.util.concurrent.*
+import php.runtime.reflection.ClassEntity
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
 
 /**
  * 包装 CompletableFuture 对象
@@ -16,7 +17,13 @@ import java.util.concurrent.*
  *
  */
 @Reflection.Name("php\\lang\\CompletableFuture")
-class WrapCompletableFuture(env: Environment, public val future: CompletableFuture<Any?>) : BaseObject(env) {
+class WrapCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
+
+    constructor(env: Environment, wrappedObject: CompletableFuture<Any?>) : super(env, wrappedObject) {}
+    constructor(env: Environment, clazz: ClassEntity) : super(env, clazz) {}
+
+    public val future: CompletableFuture<Any?>
+        get() = __wrappedObject
 
     init{
         // 调试用
