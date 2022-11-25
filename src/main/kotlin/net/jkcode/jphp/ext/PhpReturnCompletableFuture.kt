@@ -1,7 +1,5 @@
 package net.jkcode.jphp.ext
 
-import php.runtime.Memory
-import php.runtime.memory.ObjectMemory
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -21,35 +19,6 @@ class PhpReturnCompletableFuture(future: CompletableFuture<Any?>): CompletableFu
                 this.complete(r)
             else
                 this.completeExceptionally(ex)
-        }
-    }
-
-    companion object{
-
-        /**
-         * 对supplier包装try/catch, 并包装与返回异步结果, 兼容supplier结果值是 CompletableFuture 的情况
-         *
-         * @param supplier 取值函数
-         * @return
-         */
-        public inline fun tryPhpSupplierFuture(supplier: () -> Memory): CompletableFuture<Any?> {
-            try{
-                // 调用取值函数
-                val result = supplier.invoke()
-
-                // 异步结果: 使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 PCompletableFuture 的情况
-                if(result is ObjectMemory && result.value is PCompletableFuture) {
-                    val f = (result.value as PCompletableFuture).future
-                    return PhpReturnCompletableFuture(f)
-                }
-
-                // 同步结果
-                return CompletableFuture.completedFuture(result)
-            }catch (r: Throwable){
-                val result2 = CompletableFuture<Any?>()
-                result2.completeExceptionally(r)
-                return result2
-            }
         }
     }
 }

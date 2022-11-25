@@ -3,8 +3,11 @@ package net.jkcode.jphp.ext
 import co.paralleluniverse.fibers.Suspendable
 import net.jkcode.jkguard.IMethodGuardInvoker
 import net.jkcode.jkguard.IMethodMeta
+import net.jkcode.jkutil.common.commonLogger
+import net.jkcode.jkutil.common.errorColor
 import net.jkcode.jkutil.fiber.AsyncCompletionStage
 import php.runtime.Memory
+import php.runtime.ext.java.JavaException
 import php.runtime.memory.ObjectMemory
 import php.runtime.reflection.MethodEntity
 import java.util.concurrent.CompletableFuture
@@ -111,5 +114,37 @@ class PhpMethodMeta(
     override fun invoke(obj: Any, vararg args: Any?): Memory {
         // 调用php方法
         return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.environment, null, *(args as Array<Memory>))
+    }
+
+    /**
+     * 对invoke()包装try/catch, 并包装与返回异步结果, 兼容invoke()结果值是 CompletableFuture 的情况
+     *
+     * @param obj php对象
+     * @param args php参数
+     * @return
+     */
+    public inline fun tryInvokeFuture(obj: Any, vararg args: Any?): CompletableFuture<Any?> {
+        try{
+            // 调用php方法
+            val result = invoke(obj, *args)
+
+            // 异步结果: 使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 PCompletableFuture 的情况, 用在 PhpMethodMeta.getResultFromFuture() 根据结果值类型来决定返回异步or同步结果
+            if(result is ObjectMemory && result.value is PCompletableFuture) {
+                val f = (result.value as PCompletableFuture).future
+                return PhpReturnCompletableFuture(f)
+            }
+
+            // 同步结果
+            return CompletableFuture.completedFuture(result)
+        }catch (r: Throwable){
+            // 如果是php包装的异常, 则立即打印java原生异常, 否则到http请求处理层时就丢失了java原生的调用栈, 打印了也找不到出错点, 参考<jphp-异常处理.md>
+            if(r is JavaException)
+                commonLogger.errorColor("调用php方法[$clazzName::$methodName()]时出现java异常如下, 要结合下一个php异常+断点调试来分析", r.throwable)
+
+            // 异常结果
+            val result2 = CompletableFuture<Any?>()
+            result2.completeExceptionally(r)
+            return result2
+        }
     }
 }

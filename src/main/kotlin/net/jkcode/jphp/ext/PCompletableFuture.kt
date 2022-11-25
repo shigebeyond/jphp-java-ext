@@ -28,13 +28,6 @@ class PCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
     public val future: CompletableFuture<Any?>
         get() = __wrappedObject
 
-    init{
-        // 调试用
-        future.exceptionally { ex ->
-            ex.printStackTrace()
-        }
-    }
-
     // ---------------------- Future 方法扩展: 参考 WrapFuture ----------------------
     @Reflection.Signature
     private fun __construct(env: Environment, vararg args: Memory): Memory {
