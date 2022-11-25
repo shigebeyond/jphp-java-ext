@@ -5,7 +5,7 @@ import net.jkcode.jkutil.common.getAccessibleField
 import org.junit.Test
 import php.runtime.env.Context
 import php.runtime.env.Environment
-import net.jkcode.jphp.ext.WrapJavaObject
+import net.jkcode.jphp.ext.PJavaObject
 import php.runtime.loader.compile.StandaloneCompiler
 import php.runtime.memory.support.MemoryUtils
 import java.io.File
@@ -28,9 +28,9 @@ class JphpTests {
         val data = mapOf(
                 "name" to "shi",
                 "maparray" to mapOf("age" to 11, "addr" to "nanning"), // 会转换php的array类型（即java的ArrayMemory）
-                // WrapJavaObject
-                "mapjo" to WrapJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
-                "pojo" to WrapJavaObject.of(lan.environment, Message("title", "jkcode代码库"))
+                // PJavaObject
+                "mapjo" to PJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
+                "pojo" to PJavaObject.of(lan.environment, Message("title", "jkcode代码库"))
         )
         val ret = lan.run("src/test/resources/index.php", data)
         println("----> $ret")
@@ -77,7 +77,7 @@ class JphpTests {
     fun testPerformancePhp(){
         val lan = JphpLauncher
         val data = mapOf(
-                "map" to WrapJavaObject.of(lan.environment, mutableMapOf("age" to 13))
+                "map" to PJavaObject.of(lan.environment, mutableMapOf("age" to 13))
         )
         for (p in 0 until 10) {
             lan.run("src/test/resources/performance.php", data)

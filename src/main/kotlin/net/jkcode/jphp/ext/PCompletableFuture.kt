@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  *
  */
 @Reflection.Name("php\\lang\\CompletableFuture")
-class WrapCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
+class PCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
 
     constructor(env: Environment, wrappedObject: CompletableFuture<Any?>) : super(env, wrappedObject) {}
 
@@ -73,27 +73,27 @@ class WrapCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
 
     // ---------------------- CompletableFuture 方法扩展 ----------------------
     @Reflection.Signature
-    fun thenApply(env: Environment, invoker: Invoker): WrapCompletableFuture {
+    fun thenApply(env: Environment, invoker: Invoker): PCompletableFuture {
         val f = future.thenApply { v ->
             invoker.callMemoryOrAny(v)
         }
-        return WrapCompletableFuture(env, f as CompletableFuture<Any?>)
+        return PCompletableFuture(env, f as CompletableFuture<Any?>)
     }
 
     @Reflection.Signature
-    fun exceptionally(env: Environment, invoker: Invoker): WrapCompletableFuture {
+    fun exceptionally(env: Environment, invoker: Invoker): PCompletableFuture {
         val f = future.exceptionally { ex ->
             invoker.callMemoryOrAny(ex) as Nothing?
         }
-        return WrapCompletableFuture(env, f)
+        return PCompletableFuture(env, f)
     }
 
     @Reflection.Signature
-    fun whenComplete(env: Environment, invoker: Invoker): WrapCompletableFuture {
+    fun whenComplete(env: Environment, invoker: Invoker): PCompletableFuture {
         val f = future.whenComplete { r, ex ->
             invoker.callMemoryOrAny(r, ex)
         }
-        return WrapCompletableFuture(env, f)
+        return PCompletableFuture(env, f)
     }
 
 }

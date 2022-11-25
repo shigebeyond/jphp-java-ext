@@ -68,7 +68,7 @@ public inline fun Any?.toMemory(): Memory {
         is List<*> -> ArrayMemory(this)
         is Map<*, *> -> ArrayMemory(this)
         is IObject -> ObjectMemory(this)
-        is WrapJavaObject -> ObjectMemory(this)
+        is PJavaObject -> ObjectMemory(this)
         else -> throw IllegalArgumentException("Cannot auto convert [$this] into Memory")
     }
 }

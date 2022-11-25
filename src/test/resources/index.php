@@ -14,6 +14,10 @@ $file = new File('/ohome/shi/code/jphp/jphp/sandbox/src/JPHP-INF/launcher.conf')
 echo "$file \n";
 echo 'exist: '. $file->exists() . "\n";
 
+// 日志
+use php\lang\Log;
+Log::info("-----------test-----------");
+
 // 缓存操作
 use php\lang\Cache;
 $cache = Cache::instance("jedis");
@@ -31,9 +35,9 @@ echo 'size: '. $method->invoke($obj) . "\n";
 echo 'size: '. $method->invokeArgs($obj, []) . "\n";
 
 // 包装java，方便调用java方法
-use php\lang\WrapJavaObject;
+use php\lang\PJavaObject;
 // 包装string类型java对象
-$strjo = new WrapJavaObject($name);
+$strjo = new PJavaObject($name);
 // echo $strjo->length()."\n";
 // echo $strjo->concat(" is hero")."\n";
 echo $strjo->substring(3)."\n";
@@ -55,9 +59,11 @@ echo $pojo->getMessage()."\n";
 $pojo->key = 'title2'; // 写属性，先尝试调用setter方法，然后写属性
 echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属性
 
+/*
 echo __FILE__."\n";
 echo dirname(__FILE__)."\n";
-include 'src/test/resources/test.php';
+include 'src/test/resources/performance.php';
+*/
 
 return [
     'name' => 'shi'

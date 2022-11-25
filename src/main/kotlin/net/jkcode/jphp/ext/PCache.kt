@@ -1,22 +1,14 @@
 package net.jkcode.jphp.ext
 
 import net.jkcode.jkutil.cache.ICache
-import net.jkcode.jkutil.common.getMethodByName
-import net.jkcode.jkutil.common.ucFirst
 import php.runtime.Memory
 import php.runtime.annotation.Reflection
 import php.runtime.env.Environment
-import php.runtime.ext.java.JavaClass
-import php.runtime.ext.java.JavaMethod
 import php.runtime.ext.java.JavaObject
-import php.runtime.ext.java.JavaReflection
 import php.runtime.lang.BaseWrapper
 import php.runtime.memory.ObjectMemory
-import php.runtime.memory.StringMemory
 import php.runtime.memory.support.MemoryUtils
 import php.runtime.reflection.ClassEntity
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.TimeUnit
 
 /**
  * 包装cache
@@ -24,7 +16,7 @@ import java.util.concurrent.TimeUnit
  *    php中的方法调用: $cache->get("key");
  */
 @Reflection.Name("php\\lang\\Cache")
-open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
+open class PCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
 
     // 缓存配置名
     lateinit var name: String
@@ -115,7 +107,7 @@ open class WrapCache(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObj
         @Reflection.Signature
         @JvmStatic
         fun instance(env: Environment, name: String = "jedis"): Memory {
-            val cache = WrapCache(env, env.fetchClass("php\\lang\\Cache"))
+            val cache = PCache(env, env.fetchClass("php\\lang\\Cache"))
             cache.name = name
             return ObjectMemory(cache)
         }

@@ -81,14 +81,14 @@ object JphpLauncher : Launcher() {
         // 注册java对象， 方便调用java对象
         val core = compileScope.getExtension("Core")
         compileScope.registerLazyClass(core, JavaObject::class.java)
-        compileScope.registerLazyClass(core, WrapJavaObject::class.java)
-        compileScope.registerLazyClass(core, WrapCache::class.java)
-        compileScope.registerLazyClass(core, WrapCompletableFuture::class.java)
+        compileScope.registerLazyClass(core, PJavaObject::class.java)
+        compileScope.registerLazyClass(core, PCache::class.java)
+        compileScope.registerLazyClass(core, PCompletableFuture::class.java)
         // bug: php.runtime.reflection.CompileMethodEntity$CompileMethod$Method.setParameters(CompileMethodEntity.java:314) 报错 Unsupported type for binding - class java.util.concurrent.CompletableFuture in net.jkcode.jkmvc.http.jphp.PHttpRequest.transferAndReturn
         // 原因: MemoryOperation 转换器中没包含 CompletableFuture 类型转换
         // 解决: 参考实现 extend.registerWrapperClass(scope, CompletableFuture::class.java, PCompletableFuture::class.java)
-         MemoryOperation.registerWrapper(CompletableFuture::class.java, WrapCompletableFuture::class.java);
-         MemoryOperation.registerWrapper(PhpReturnCompletableFuture::class.java, WrapCompletableFuture::class.java);
+         MemoryOperation.registerWrapper(CompletableFuture::class.java, PCompletableFuture::class.java);
+         MemoryOperation.registerWrapper(PhpReturnCompletableFuture::class.java, PCompletableFuture::class.java);
         // 注册 JkHashMapMemoryOperation, 以便替代 HashMapMemoryOperation (HashMapMemoryOperation由于没有指定key/value泛型, 导致转换时报错ArrayIndexOutOfBoundsException)
         MemoryOperation.register(JkHashMapMemoryOperation())
 

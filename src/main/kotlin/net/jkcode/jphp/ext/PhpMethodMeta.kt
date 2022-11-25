@@ -70,14 +70,16 @@ class PhpMethodMeta(
 
     /**
      * 从CompletableFuture获得方法结果值
-     *    同步结果值有可能是null或java对象
+     *    1 区别于java方法实现(MethodMeta.getResultFromFuture()): 根据java方法返回类型(是否CompletableFuture)来决定返回异步or同步结果
+     *      php方法是无返回类型, 只能运行时根据结果的实际类型(是否CompletableFuture)来决定返回异步or同步结果
+     *    2 同步结果值有可能是null或java对象
      * @param resFuture
      * @return
      */
     @Suspendable
     override fun getResultFromFuture(resFuture: CompletableFuture<*>): Any?{
         // 1 异步结果
-        // 由于php方法无法获得返回值类型, 因此使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 WrapCompletableFuture 的情况
+        // 由于php方法无法获得返回值类型, 因此使用 PhpCompletableFuture 扩展类来标识php方法返回值类型是 PCompletableFuture 的情况
 //        if(returnType == Future::class.java || returnType == CompletableFuture::class.java)
         if(resFuture is PhpReturnCompletableFuture)
             return resFuture

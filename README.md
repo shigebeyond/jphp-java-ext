@@ -15,7 +15,7 @@ import net.jkcode.jphp.ext.JphpLauncher
 JphpLauncher.run("index.php" /* php 文件路径 */, mapOf("name" to "shi") /* 包含变量名与变量值的map */)
 ```
 ## 2 增强对java对象的操作
-主要是实现`WrapJavaObject`，方便包装java对象，并在php中直接读写属性与调用方法
+主要是实现`PJavaObject`，方便包装java对象，并在php中直接读写属性与调用方法
 
 ### 2.1 java调用端
 ```
@@ -25,26 +25,26 @@ fun testJphpLauncher(){
     val data = mapOf(
             "name" to "shi",
             "maparray" to mapOf("age" to 11, "addr" to "nanning"), // 会转换php的array类型（即java的ArrayMemory）
-            // WrapJavaObject
-            "mapjo" to WrapJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
-            "pojo" to WrapJavaObject.of(lan.environment, Message("title", "jkcode代码库"))
+            // PJavaObject
+            "mapjo" to PJavaObject.of(lan.environment, mapOf("goods_id" to 1, "goods_name" to "火龙果", "quantity" to 13)),
+            "pojo" to PJavaObject.of(lan.environment, Message("title", "jkcode代码库"))
     )
     lan.run("src/test/resources/index.php", data)
 }
 ```
 
 ### 2.2 php渲染端
-1. 使用 WrapJavaObject 包含变量
+1. 使用 PJavaObject 包含变量
 ```
-use php\lang\WrapJavaObject;
+use php\lang\PJavaObject;
 // 包装string类型java对象
-$strjo = new WrapJavaObject($name);
+$strjo = new PJavaObject($name);
 // echo $strjo->length()."\n";
 // echo $strjo->concat(" is hero")."\n";
 echo $strjo->substring(3)."\n"; 
 ```
 
-2. 使用 java塞进来的 WrapJavaObject 对象
+2. 使用 java塞进来的 PJavaObject 对象
 2.1 包装hashmap
 ```
 // 包装hashmap类型java对象

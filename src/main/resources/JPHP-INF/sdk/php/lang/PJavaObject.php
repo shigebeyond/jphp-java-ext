@@ -2,10 +2,10 @@
 namespace php\lang;
 
 /**
- * Class WrapJavaObject
+ * Class PJavaObject
  * @packages std, core
  */
-class WrapJavaObject
+class PJavaObject
 {
 
     /**

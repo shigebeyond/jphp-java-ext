@@ -21,12 +21,12 @@ import php.runtime.reflection.ClassEntity
  *    动态调用方法的实现，使用魔术方法，使用`JavaMethod.invokeArgs()`来负责参数类型+返回值类型转换
  * 2 属性读写先调动getter/setter
  * 3 使用
- *    java中的实例化： val obj = WrapJavaObject.of(env, xxx)
- *    php中的实例化: $obj = new WrapJavaObject($xxx);
+ *    java中的实例化： val obj = PJavaObject.of(env, xxx)
+ *    php中的实例化: $obj = new PJavaObject($xxx);
  *    php中的方法调用（默认方法）: $obj->yyy();
  */
-@Reflection.Name("php\\lang\\WrapJavaObject")
-open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
+@Reflection.Name("php\\lang\\PJavaObject")
+open class PJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<JavaObject>(env, clazz) {
 
     // 被包装的java对象
     lateinit var obj: Any
@@ -130,9 +130,9 @@ open class WrapJavaObject(env: Environment, clazz: ClassEntity) : BaseWrapper<Ja
     }
 
     companion object {
-        // 创建 WrapJavaObject 实例
-        fun of(env: Environment, value: Any): WrapJavaObject {
-            val javaObject = WrapJavaObject(env, env.fetchClass("php\\lang\\WrapJavaObject"))
+        // 创建 PJavaObject 实例
+        fun of(env: Environment, value: Any): PJavaObject {
+            val javaObject = PJavaObject(env, env.fetchClass("php\\lang\\PJavaObject"))
             javaObject.obj = value
             return javaObject
         }
