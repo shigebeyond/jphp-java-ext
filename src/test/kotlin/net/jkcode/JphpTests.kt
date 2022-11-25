@@ -6,6 +6,7 @@ import org.junit.Test
 import php.runtime.env.Context
 import php.runtime.env.Environment
 import net.jkcode.jphp.ext.PJavaObject
+import net.jkcode.jphp.ext.PReg
 import php.runtime.loader.compile.StandaloneCompiler
 import php.runtime.memory.support.MemoryUtils
 import java.io.File
@@ -82,6 +83,16 @@ class JphpTests {
         for (p in 0 until 10) {
             lan.run("src/test/resources/performance.php", data)
         }
+    }
+
+
+    @Test
+    fun testPreg(){
+        val reg = "\\d(\\w)"
+        val input = "1a 2a 3b"
+        println(PReg.find(reg, input))
+        println(PReg.findAll(reg, input))
+        println(PReg.replace(reg, "hello", input))
     }
 
 }

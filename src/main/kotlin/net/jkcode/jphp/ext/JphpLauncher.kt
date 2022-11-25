@@ -85,6 +85,7 @@ object JphpLauncher : Launcher() {
         compileScope.registerLazyClass(core, JavaObject::class.java)
         compileScope.registerLazyClass(core, PJavaObject::class.java)
         compileScope.registerLazyClass(core, PLog::class.java)
+        compileScope.registerLazyClass(core, PReg::class.java)
         compileScope.registerLazyClass(core, PCache::class.java)
         compileScope.registerLazyClass(core, PCompletableFuture::class.java)
         // bug: php.runtime.reflection.CompileMethodEntity$CompileMethod$Method.setParameters(CompileMethodEntity.java:314) 报错 Unsupported type for binding - class java.util.concurrent.CompletableFuture in net.jkcode.jkmvc.http.jphp.PHttpRequest.transferAndReturn
@@ -192,7 +193,7 @@ object JphpLauncher : Launcher() {
             // die异常: 当成功处理
             val dieEx = tryFetchDieException(e)
             if(dieEx != null){
-                if(out != null)
+                if(out != null && !dieEx.message.isNullOrBlank())
                     out.writer().write(dieEx.message)
                 return null
             }

@@ -2,6 +2,25 @@
 // 变量
 echo "Hello $name\n";
 
+// 正则
+use php\lang\Reg;
+$reg = "\\d(\\w)";
+$input = "1a 2a 3b";
+var_dump(Reg::find($reg, $input));
+var_dump(Reg::findAll($reg, $input));
+echo Reg::replace($reg, 'hello', $input);
+echo "\n";
+var_dump(Reg::split(' ', $input));
+
+// 正则
+use php\util\Regex;
+$reg = new Regex('[0-9]+', 0, "shi123");
+echo $reg->replace("-ge");
+echo "\n";
+echo Regex::match('^[0-9]+$', '03894') == 1;
+echo "\n";
+var_dump(Regex::split('[0-9]+', 'foo93894bar840'));
+
 // 数组操作
 var_dump($maparray);
 echo $maparray['age']."\n";
