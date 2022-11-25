@@ -3,12 +3,14 @@ package net.jkcode.jphp.ext
 import net.jkcode.jkutil.common.getAccessibleField
 import php.runtime.Memory
 import php.runtime.env.CallStackItem
+import php.runtime.env.DieException
 import php.runtime.env.Environment
 import php.runtime.env.TraceInfo
 import php.runtime.env.handler.ExceptionHandler
 import php.runtime.ext.core.OutputFunctions
 import php.runtime.ext.core.classes.WrapClassLoader
 import php.runtime.ext.core.classes.WrapClassLoader.WrapLauncherClassLoader
+import php.runtime.ext.java.JavaException
 import php.runtime.ext.java.JavaObject
 import php.runtime.launcher.LaunchException
 import php.runtime.launcher.Launcher
@@ -123,6 +125,7 @@ object JphpLauncher : Launcher() {
     /**
      * 执行指定php文件，并输出到指定流
      *    php执行结果有可能是PCompletableFuture, 直接返回future, 以便调用端处理异步结果
+     *    TODO: 异步方法，返回值类型为 CompletableFuture
      *
      * @param bootstrapFile php入口文件
      * @param args 参数
@@ -185,6 +188,16 @@ object JphpLauncher : Launcher() {
             if (ret is PCompletableFuture) // 返回值有可能是future包装器, 直接返回future, 以便调用端处理异步结果
                 return ret.future
             return ret
+        }catch (e: Exception){
+            // die异常: 当成功处理
+            val dieEx = tryFetchDieException(e)
+            if(dieEx != null){
+                if(out != null)
+                    out.writer().write(dieEx.message)
+                return null
+            }
+            // 其他异常: 往上抛
+            throw e
         } finally {
             // 恢复原来的异常处理器
             if(exceptionHandler != null)
@@ -206,6 +219,22 @@ object JphpLauncher : Launcher() {
             // 清理gc对象 + OutputBuffer
             environment.doFinal()
         }
+    }
+
+    /**
+     * 从异常链中获得 DieException
+     */
+    private fun tryFetchDieException(e: Throwable): DieException?{
+        var ex: Throwable? = e
+        while(ex != null){
+            if(ex is DieException)
+                return ex
+            if(ex is JavaException)
+                ex = ex.throwable
+            else
+                ex = ex.cause
+        }
+        return null
     }
 
 }
