@@ -22,6 +22,7 @@ class PReg(env: Environment) : BaseObject(env) {
 
         /**
          * 找多个
+         *   每个匹配一行，一行有多个分组
          */
         @Reflection.Signature
         @JvmStatic
@@ -30,6 +31,25 @@ class PReg(env: Environment) : BaseObject(env) {
             return rs.mapTo(ArrayList()) {
                 it.groupValues
             }
+        }
+
+        /**
+         * 找多个
+         *   每组一行，一行只有一个分组，但包含该分组的所有匹配
+         */
+        @Reflection.Signature
+        @JvmStatic
+        fun findAllInvert(pattern: String, subject: String): List<List<String>> {
+            val rs = pattern.toRegex().findAll(subject)
+            val ngroup = rs.first().groups.size
+            val gs = ArrayList<ArrayList<String>>(ngroup)
+            for(i in 0 until ngroup)
+                gs.add(ArrayList())
+            for(r in rs){
+                for(i in 0 until ngroup)
+                    gs[i].add(r.groups[i]!!.value)
+            }
+            return gs
         }
 
         /**
