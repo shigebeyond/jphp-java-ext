@@ -16,8 +16,16 @@ class Reg
 
     /**
      * 找多个
+     *   每个匹配一行
      */
     static function findAll(string $pattern, string $subject): array {
+    }
+
+    /**
+     * 找多个
+     *   每组一行
+     */
+    static function findAllInvert($pattern, $subject): array{
     }
 
     /**

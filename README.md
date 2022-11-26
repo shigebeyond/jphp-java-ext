@@ -14,6 +14,7 @@ import net.jkcode.jphp.ext.JphpLauncher
 // 执行 index.php 文件，并设置变量$name = "shi"
 JphpLauncher.run("index.php" /* php 文件路径 */, mapOf("name" to "shi") /* 包含变量名与变量值的map */)
 ```
+
 ## 2 增强对java对象的操作
 主要是实现`PJavaObject`，方便包装java对象，并在php中直接读写属性与调用方法
 
@@ -70,7 +71,40 @@ echo $pojo->key."\n"; // 读属性, 先尝试调用getter方法，然后读属�
 2. 卸载旧php文件的模块/类/方法等
 3. 加载新php文件的模块/类/方法等
 
-## 4 支持缓存操作
+## 4 优化异常处理
+1. 修复问题: jphp异常日志中缺失java原始异常信息
+2. 截断DieException, 并直接输出其message
+
+## 5 优化转换器
+1. 添加默认的转换器
+2. 添加`CompletableFuture`的转换器
+3. 完善`HashMap`的转换器
+
+## 6 支持异步处理
+1. 实现`PCompletableFuture`，负责包装 `PCompletableFuture`
+2. `JphpLauncher.run()` 支持返回 `CompletableFuture`
+
+## 7 支持日志
+```
+use php\lang\Log;
+Log::info("hello {}", ["shi"]);
+Log::error("hello shi");
+```
+
+## 8 支持正则
+```
+use php\lang\Reg;
+$reg = "\\d(\\w)";
+$input = "1a 2a 3b";
+var_dump(Reg::find($reg, $input));
+var_dump(Reg::findAll($reg, $input));//每个匹配一行
+var_dump(Reg::findAllInvert($reg, $input));//每组一行
+echo Reg::replace($reg, 'hello', $input);
+echo "\n";
+var_dump(Reg::split(' ', $input));
+```
+
+## 9 支持缓存操作
 ```php
 use php\lang\Cache;
 $cache = Cache::instance("jedis");
@@ -78,25 +112,25 @@ $cache->set("key", "xxxx");
 echo $cache->get("key");
 ```
 
-## 5 整合到jkguard库
+## 10 整合到jkguard库
 抽象 IMethodMeta 体系, 以便兼容java方法与php方法, 从而将java/php方法调用都纳入 jkguard的守护体系中
 
 详见[《jkguard整合jphp-守护php方法》](https://github.com/shigebeyond/jkguard/blob/master/doc/jphp.md)
 
-## 6 整合到jkmvc框架
-6.1 支持php写db/orm代码
+## 11 整合到jkmvc框架
+1. 支持php写db/orm代码
 详见[jkmvc整合jphp-db/orm](https://github.com/shigebeyond/jkmvc/blob/master/doc/orm/jphp.cn.md)
 
-6.2 支持php写controller代码
+2. 支持php写controller代码
 详见[jkmvc整合jphp-controller](https://github.com/shigebeyond/jkmvc/blob/master/doc/http/jphp.cn.md)
 
-## 7 整合到jksoa框架
+## 12 整合到jksoa框架
 支持php调用rpc服务
 详见[jksoa整合jphp](https://github.com/shigebeyond/jksoa/blob/master/doc/rpc/client/jphp.md)
 
-## 8 性能最好的模板引擎
+## 13 性能最好的模板引擎
 
-### 8.1 性能对比
+### 13.1 性能对比
 针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试。
 
 1. 测试思路
@@ -112,7 +146,7 @@ echo $cache->get("key");
 ```
 => jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
-### 8.2 附上3个模板引擎对应的测试模板代码
+### 13.2 附上3个模板引擎对应的测试模板代码
 1. jphp引擎：
 test.php
 ```

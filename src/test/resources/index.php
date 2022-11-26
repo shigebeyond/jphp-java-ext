@@ -2,12 +2,17 @@
 // 变量
 echo "Hello $name\n";
 
+// 日志
+use php\lang\Log;
+Log::info("hello {}", ["shi"]);
+
 // 正则
 use php\lang\Reg;
 $reg = "\\d(\\w)";
 $input = "1a 2a 3b";
 var_dump(Reg::find($reg, $input));
-var_dump(Reg::findAll($reg, $input));
+var_dump(Reg::findAll($reg, $input));//每个匹配一行
+var_dump(Reg::findAllInvert($reg, $input));//每组一行
 echo Reg::replace($reg, 'hello', $input);
 echo "\n";
 var_dump(Reg::split(' ', $input));
@@ -32,10 +37,6 @@ use php\io\File;
 $file = new File('/ohome/shi/code/jphp/jphp/sandbox/src/JPHP-INF/launcher.conf');
 echo "$file \n";
 echo 'exist: '. $file->exists() . "\n";
-
-// 日志
-use php\lang\Log;
-Log::info("-----------test-----------");
 
 // 缓存操作
 use php\lang\Cache;
