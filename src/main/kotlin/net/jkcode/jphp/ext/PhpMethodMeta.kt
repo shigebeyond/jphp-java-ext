@@ -7,6 +7,8 @@ import net.jkcode.jkutil.common.commonLogger
 import net.jkcode.jkutil.common.errorColor
 import net.jkcode.jkutil.fiber.AsyncCompletionStage
 import php.runtime.Memory
+import php.runtime.env.CallStackItem
+import php.runtime.env.TraceInfo
 import php.runtime.ext.java.JavaException
 import php.runtime.memory.ObjectMemory
 import php.runtime.reflection.MethodEntity
@@ -112,8 +114,29 @@ class PhpMethodMeta(
      */
     @Suspendable
     override fun invoke(obj: Any, vararg args: Any?): Memory {
-        // 调用php方法
-        return method.invokeDynamic((obj as ObjectMemory).value, JphpLauncher.environment, null, *(args as Array<Memory>))
+        val env = JphpLauncher.environment
+        // 1 调用入栈, 否则无法丢失当前类, 会导致无法调用父类私有方法的bug
+        val stackItem = buildStackItem(obj, args)
+        env.pushCall(stackItem)
+        // 2 调用php方法
+        try {
+            return method.invokeDynamic((obj as ObjectMemory).value, env, null, *(args as Array<Memory>))
+        }finally {
+            // 3 调用出栈
+            env.popCall()
+        }
+    }
+
+    /**
+     * 构建调用栈项
+     */
+    private fun buildStackItem(obj: Any, args: Array<out Any?>): CallStackItem {
+        val clazz = this.method.clazz
+        val trace = TraceInfo(clazz.module.name, 0, 0)
+        val stackItem = CallStackItem(trace, (obj as ObjectMemory).value, args as Array<Memory>, method.name, clazz.name, clazz.name)
+        stackItem.staticClassEntity = clazz
+        stackItem.classEntity = clazz
+        return stackItem
     }
 
     /**
