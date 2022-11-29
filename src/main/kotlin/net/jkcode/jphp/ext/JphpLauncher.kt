@@ -85,6 +85,7 @@ object JphpLauncher : Launcher() {
         compileScope.registerLazyClass(core, JavaObject::class.java)
         compileScope.registerLazyClass(core, PJavaObject::class.java)
         compileScope.registerLazyClass(core, PLog::class.java)
+        compileScope.registerLazyClass(core, PZip::class.java)
         compileScope.registerLazyClass(core, PReg::class.java)
         compileScope.registerLazyClass(core, PCache::class.java)
         compileScope.registerLazyClass(core, PCompletableFuture::class.java)

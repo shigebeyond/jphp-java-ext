@@ -112,25 +112,33 @@ $cache->set("key", "xxxx");
 echo $cache->get("key");
 ```
 
-## 10 整合到jkguard库
+## 10 支持压缩与解压
+```php
+use php\lang\Zip;
+$zipfile = "/ohome/shi/test/test.zip";
+Zip::zip("/ohome/shi/test/compare", $zipfile);
+Zip::unzip($zipfile, "/ohome/shi/test/compare2");
+```
+
+## 11 整合到jkguard库
 抽象 IMethodMeta 体系, 以便兼容java方法与php方法, 从而将java/php方法调用都纳入 jkguard的守护体系中
 
 详见[《jkguard整合jphp-守护php方法》](https://github.com/shigebeyond/jkguard/blob/master/doc/jphp.md)
 
-## 11 整合到jkmvc框架
+## 12 整合到jkmvc框架
 1. 支持php写db/orm代码
 详见[jkmvc整合jphp-db/orm](https://github.com/shigebeyond/jkmvc/blob/master/doc/orm/jphp.cn.md)
 
 2. 支持php写controller代码
 详见[jkmvc整合jphp-controller](https://github.com/shigebeyond/jkmvc/blob/master/doc/http/jphp.cn.md)
 
-## 12 整合到jksoa框架
+## 13 整合到jksoa框架
 支持php调用rpc服务
 详见[jksoa整合jphp](https://github.com/shigebeyond/jksoa/blob/master/doc/rpc/client/jphp.md)
 
-## 13 性能最好的模板引擎
+## 14 性能最好的模板引擎
 
-### 13.1 性能对比
+### 14.1 性能对比
 针对 velocity / freemarker / jphp 3个模板引擎分别做了性能测试。
 
 1. 测试思路
@@ -146,7 +154,7 @@ echo $cache->get("key");
 ```
 => jphp是性能最好的模板引擎，因为jphp引擎会将php代码编译为等价的java字节码，因此他的执行效率是最高的
 
-### 13.2 附上3个模板引擎对应的测试模板代码
+### 14.2 附上3个模板引擎对应的测试模板代码
 1. jphp引擎：
 test.php
 ```

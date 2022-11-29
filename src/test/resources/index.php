@@ -6,6 +6,12 @@ echo "Hello $name\n";
 use php\lang\Log;
 Log::info("hello {}", ["shi"]);
 
+// 压缩
+use php\lang\Zip;
+$zipfile = "/ohome/shi/test/test.zip";
+Zip::zip("/ohome/shi/test/compare", $zipfile);
+Zip::unzip($zipfile, "/ohome/shi/test/compare2");
+
 // 正则
 use php\lang\Reg;
 $reg = "\\d(\\w)";
