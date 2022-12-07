@@ -1,5 +1,6 @@
 package net.jkcode.jphp.ext
 
+import net.jkcode.jkutil.common.mapToArray
 import php.runtime.Memory
 import php.runtime.annotation.Reflection
 import php.runtime.env.Environment
@@ -89,4 +90,21 @@ class PCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
         return PCompletableFuture(env, f)
     }
 
+    companion object{
+        /**
+         * 等待并合并异步结果
+         */
+        public fun join(env: Environment, fs: Array<PCompletableFuture>): PCompletableFuture {
+            val fs2 = fs.mapToArray{
+                it.future
+            }
+            val f: CompletableFuture<Void> = CompletableFuture.allOf(*fs)
+            val jf = f.thenApply {
+                fs.mapToArray { future ->
+                    future.get()
+                }
+            } as CompletableFuture<Any?>
+            return PCompletableFuture(env, jf)
+        }
+    }
 }
