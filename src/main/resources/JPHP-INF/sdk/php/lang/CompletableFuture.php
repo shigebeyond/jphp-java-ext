@@ -55,4 +55,11 @@ class CompletableFuture {
      */
     public function whenComplete(callable $callback) {}
 
+    /**
+     * 合并多个异步结果
+     * @param array $futures
+     * @return CompletableFuture
+     */
+    public function join(array $futures) {}
+
 }

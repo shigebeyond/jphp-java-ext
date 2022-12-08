@@ -92,15 +92,17 @@ class PCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
 
     companion object{
         /**
-         * 等待并合并异步结果
+         * 合并多个异步结果
          */
+        @Reflection.Signature
+        @JvmStatic
         public fun join(env: Environment, fs: Array<PCompletableFuture>): PCompletableFuture {
             val fs2 = fs.mapToArray{
                 it.future
             }
-            val f: CompletableFuture<Void> = CompletableFuture.allOf(*fs)
+            val f: CompletableFuture<Void> = CompletableFuture.allOf(*fs2)
             val jf = f.thenApply {
-                fs.mapToArray { future ->
+                fs2.mapToArray { future ->
                     future.get()
                 }
             } as CompletableFuture<Any?>
