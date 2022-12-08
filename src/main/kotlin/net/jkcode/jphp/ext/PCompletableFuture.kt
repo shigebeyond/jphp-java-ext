@@ -96,17 +96,13 @@ class PCompletableFuture: BaseWrapper<CompletableFuture<Any?>> {
          */
         @Reflection.Signature
         @JvmStatic
-        public fun join(env: Environment, fs: Array<PCompletableFuture>): PCompletableFuture {
-            val fs2 = fs.mapToArray{
-                it.future
-            }
-            val f: CompletableFuture<Void> = CompletableFuture.allOf(*fs2)
-            val jf = f.thenApply {
-                fs2.mapToArray { future ->
+        public fun join(env: Environment, fs: Array<CompletableFuture<*>>): CompletableFuture<Array<*>> {
+            val f: CompletableFuture<Void> = CompletableFuture.allOf(*fs)
+            return f.thenApply {
+                fs.mapToArray { future ->
                     future.get()
                 }
-            } as CompletableFuture<Any?>
-            return PCompletableFuture(env, jf)
+            }
         }
     }
 }
