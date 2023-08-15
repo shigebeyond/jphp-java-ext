@@ -18,10 +18,11 @@ if(ext.has('env') && ext.env == 'dev'){
 //gradle脚本自身需要使用的资源
 buildscript {
     repositories {
-        jcenter()
-        mavenCentral()
         maven {
-            url 'https://maven.aliyun.com/repository/public/'
+            url 'https://maven.aliyun.com/repository/gradle-plugin/'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/public/' // 等价central+jcenter
         }
         maven {
             url "http://dl.bintray.com/kotlin/kotlin"
@@ -70,9 +71,8 @@ project(':') {
 
     repositories {
         mavenLocal()
-        mavenCentral()
         maven {
-            url 'https://maven.aliyun.com/repository/public/'
+            url 'https://maven.aliyun.com/repository/public/' // 等价central+jcenter
         }
         maven { // jphp
             url "https://jitpack.io"
